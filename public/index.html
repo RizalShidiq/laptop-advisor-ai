@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Laptop Recommender</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Cari Laptop Terbaikmu dengan AI</h1>
+            <p>Jawab beberapa pertanyaan singkat, dan biarkan AI kami menemukan laptop yang paling pas untukmu.</p>
+        </header>
+
+        <form id="laptop-form">
+            <label for="budget">Berapa Budget Maksimal Anda? (dalam Rupiah)</label>
+            <input type="number" id="budget" name="budget" placeholder="Contoh: 10000000" required>
+
+            <label>Apa Tujuan Utama Penggunaan Laptop?</label>
+            <div class="checkbox-group">
+                <input type="checkbox" id="usage-office" name="usage" value="Pekerjaan Kantor & Kuliah">
+                <label for="usage-office">Pekerjaan Kantor & Kuliah</label>
+                <input type="checkbox" id="usage-gaming" name="usage" value="Gaming">
+                <label for="usage-gaming">Gaming</label>
+                <input type="checkbox" id="usage-editing" name="usage" value="Video/Photo Editing">
+                <label for="usage-editing">Video/Photo Editing</label>
+                 <input type="checkbox" id="usage-programming" name="usage" value="Programming">
+                <label for="usage-programming">Programming</label>
+            </div>
+
+            <label for="priority">Apa yang Paling Anda Prioritaskan?</label>
+            <select id="priority" name="priority">
+                <option value="Performa Terbaik">Performa Terbaik</option>
+                <option value="Portabilitas (Ringan & Tipis)">Portabilitas (Ringan & Tipis)</option>
+                <option value="Daya Tahan Baterai">Daya Tahan Baterai</option>
+            </select>
+
+            <label for="os">Preferensi Sistem Operasi?</label>
+            <select id="os" name="os">
+                <option value="Windows">Windows</option>
+                <option value="macOS">macOS</option>
+                <option value="Bebas (Tidak ada preferensi)">Bebas</option>
+            </select>
+
+            <label>Ada Fitur Tambahan yang Diinginkan?</label>
+            <div class="checkbox-group">
+                <input type="checkbox" id="feature-touchscreen" name="features" value="Layar Sentuh (Touchscreen)">
+                <label for="feature-touchscreen">Layar Sentuh</label>
+                <input type="checkbox" id="feature-gpu" name="features" value="GPU Khusus (Nvidia/AMD)">
+                <label for="feature-gpu">GPU Khusus (Nvidia/AMD)</label>
+            </div>
+
+            <button type="submit" id="submit-btn">Cari Rekomendasi</button>
+        </form>
+
+        <div id="loading" class="hidden">
+            <div class="spinner"></div>
+            <p>AI sedang menganalisis... Mohon tunggu sebentar.</p>
+        </div>
+
+        <div id="results-container" class="hidden">
+            <h2>✨ Berikut Rekomendasi Terbaik Untukmu</h2>
+            <div id="recommendations"></div>
+            </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

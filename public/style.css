@@ -1,0 +1,125 @@
+/* (Tambahkan kode CSS di sini untuk membuat tampilan lebih menarik) */
+/* Contoh sederhana: */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f7f9;
+  color: #333;
+  line-height: 1.6;
+}
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+h1 {
+  color: #2c3e50;
+}
+label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+input[type="number"],
+select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 10px;
+}
+.checkbox-group input {
+  margin-right: 5px;
+}
+button {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  margin-top: 2rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+button:hover {
+  background-color: #2980b9;
+}
+.hidden {
+  display: none !important;
+}
+#loading {
+  text-align: center;
+  padding: 2rem;
+}
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+#results-container {
+  margin-top: 2rem;
+}
+.recommendation-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  background-color: #fafafa;
+}
+.recommendation-card h3 {
+  margin-top: 0;
+  color: #2980b9;
+}
+.recommendation-card .price {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #27ae60;
+}
+.recommendation-card .spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 1rem 0;
+}
+.recommendation-card p {
+  margin-bottom: 1rem;
+}
+.ecommerce-links a {
+  text-decoration: none;
+  padding: 8px 15px;
+  background-color: #e67e22;
+  color: white;
+  border-radius: 5px;
+  margin-right: 10px;
+  transition: background-color 0.3s;
+}
+.ecommerce-links a:hover {
+  background-color: #d35400;
+}
