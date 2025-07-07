@@ -1,70 +1,304 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Laptop Recommender</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🤖 Cari Laptop Terbaikmu dengan AI</h1>
-            <p>Jawab beberapa pertanyaan singkat, dan biarkan AI kami menemukan laptop yang paling pas untukmu.</p>
-        </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Laptop Advisor AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-slate-50 text-slate-800">
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+      <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold text-slate-900">
+          Laptop Advisor <span class="text-blue-600">AI</span>
+        </h1>
+        <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
+          Temukan laptop sempurna untuk Anda dalam 5 menit. Jawab beberapa
+          pertanyaan dan biarkan AI kami yang bekerja.
+        </p>
+      </header>
 
-        <form id="laptop-form">
-            <label for="budget">Berapa Budget Maksimal Anda? (dalam Rupiah)</label>
-            <input type="number" id="budget" name="budget" placeholder="Contoh: 10000000" required>
+      <main>
+        <section
+          id="advisor-section"
+          class="bg-white p-6 md:p-8 rounded-2xl shadow-lg max-w-4xl mx-auto"
+        >
+          <div id="questionnaire">
+            <div
+              id="step-indicators"
+              class="flex justify-center items-center space-x-4 mb-8"
+            ></div>
 
-            <label>Apa Tujuan Utama Penggunaan Laptop?</label>
-            <div class="checkbox-group">
-                <input type="checkbox" id="usage-office" name="usage" value="Pekerjaan Kantor & Kuliah">
-                <label for="usage-office">Pekerjaan Kantor & Kuliah</label>
-                <input type="checkbox" id="usage-gaming" name="usage" value="Gaming">
-                <label for="usage-gaming">Gaming</label>
-                <input type="checkbox" id="usage-editing" name="usage" value="Video/Photo Editing">
-                <label for="usage-editing">Video/Photo Editing</label>
-                 <input type="checkbox" id="usage-programming" name="usage" value="Programming">
-                <label for="usage-programming">Programming</label>
+            <div id="step-1" class="step fade-in">
+              <h3 class="text-xl font-semibold text-center mb-2">
+                Berapa Anggaran Anda?
+              </h3>
+              <p class="text-center text-slate-500 mb-6">
+                Tentukan rentang harga yang Anda inginkan dalam Rupiah.
+              </p>
+              <div
+                class="flex flex-col md:flex-row gap-4 items-center justify-center"
+              >
+                <div class="w-full md:w-1/2">
+                  <label
+                    for="budget_min"
+                    class="block text-sm font-medium text-slate-700"
+                    >Minimum (juta)</label
+                  >
+                  <input
+                    type="number"
+                    id="budget_min"
+                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    value="3"
+                  />
+                </div>
+                <div class="w-full md:w-1/2">
+                  <label
+                    for="budget_max"
+                    class="block text-sm font-medium text-slate-700"
+                    >Maksimum (juta)</label
+                  >
+                  <input
+                    type="number"
+                    id="budget_max"
+                    class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    value="20"
+                  />
+                </div>
+              </div>
             </div>
 
-            <label for="priority">Apa yang Paling Anda Prioritaskan?</label>
-            <select id="priority" name="priority">
-                <option value="Performa Terbaik">Performa Terbaik</option>
-                <option value="Portabilitas (Ringan & Tipis)">Portabilitas (Ringan & Tipis)</option>
-                <option value="Daya Tahan Baterai">Daya Tahan Baterai</option>
-            </select>
-
-            <label for="os">Preferensi Sistem Operasi?</label>
-            <select id="os" name="os">
-                <option value="Windows">Windows</option>
-                <option value="macOS">macOS</option>
-                <option value="Bebas (Tidak ada preferensi)">Bebas</option>
-            </select>
-
-            <label>Ada Fitur Tambahan yang Diinginkan?</label>
-            <div class="checkbox-group">
-                <input type="checkbox" id="feature-touchscreen" name="features" value="Layar Sentuh (Touchscreen)">
-                <label for="feature-touchscreen">Layar Sentuh</label>
-                <input type="checkbox" id="feature-gpu" name="features" value="GPU Khusus (Nvidia/AMD)">
-                <label for="feature-gpu">GPU Khusus (Nvidia/AMD)</label>
+            <div id="step-2" class="step hidden fade-in">
+              <h3 class="text-xl font-semibold text-center mb-2">
+                Apa Penggunaan Utama Laptop Anda?
+              </h3>
+              <p class="text-center text-slate-500 mb-6">
+                Pilih satu yang paling menggambarkan kebutuhan Anda.
+              </p>
+              <div
+                class="grid grid-cols-2 md:grid-cols-4 gap-4"
+                data-question="primary_use"
+              >
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="Kantor & Mahasiswa"
+                >
+                  <div class="text-4xl mb-2">💼</div>
+                  <h4 class="font-semibold">Kantor & Mahasiswa</h4>
+                </div>
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="Gaming"
+                >
+                  <div class="text-4xl mb-2">🎮</div>
+                  <h4 class="font-semibold">Gaming</h4>
+                </div>
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="Kreasi Konten (Video/Desain)"
+                >
+                  <div class="text-4xl mb-2">🎨</div>
+                  <h4 class="font-semibold">Kreasi Konten</h4>
+                </div>
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="Programming"
+                >
+                  <div class="text-4xl mb-2">💻</div>
+                  <h4 class="font-semibold">Programming</h4>
+                </div>
+              </div>
             </div>
 
-            <button type="submit" id="submit-btn">Cari Rekomendasi</button>
-        </form>
-
-        <div id="loading" class="hidden">
-            <div class="spinner"></div>
-            <p>AI sedang menganalisis... Mohon tunggu sebentar.</p>
-        </div>
-
-        <div id="results-container" class="hidden">
-            <h2>✨ Berikut Rekomendasi Terbaik Untukmu</h2>
-            <div id="recommendations"></div>
+            <div id="step-3" class="step hidden fade-in">
+              <h3 class="text-xl font-semibold text-center mb-2">
+                Apa yang Paling Penting Bagi Anda?
+              </h3>
+              <p class="text-center text-slate-500 mb-6">
+                Pilih hingga dua prioritas utama.
+              </p>
+              <div
+                class="grid grid-cols-2 md:grid-cols-4 gap-4"
+                data-question="priorities"
+                data-max-selection="2"
+              >
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="Performa"
+                >
+                  <div class="text-4xl mb-2">🚀</div>
+                  <h4 class="font-semibold">Performa</h4>
+                </div>
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="Portabilitas (Ringan)"
+                >
+                  <div class="text-4xl mb-2">✈️</div>
+                  <h4 class="font-semibold">Portabilitas</h4>
+                </div>
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="Daya Tahan Baterai"
+                >
+                  <div class="text-4xl mb-2">🔋</div>
+                  <h4 class="font-semibold">Daya Tahan Baterai</h4>
+                </div>
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="Kualitas Layar"
+                >
+                  <div class="text-4xl mb-2">🖼️</div>
+                  <h4 class="font-semibold">Kualitas Layar</h4>
+                </div>
+              </div>
             </div>
 
+            <div id="step-4" class="step hidden fade-in">
+              <h3 class="text-xl font-semibold text-center mb-2">
+                Sistem Operasi Apa yang Anda Inginkan?
+              </h3>
+              <p class="text-center text-slate-500 mb-6">
+                Pilih preferensi sistem operasi Anda.
+              </p>
+              <div
+                class="grid grid-cols-2 md:grid-cols-4 gap-4"
+                data-question="os"
+              >
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="Windows"
+                >
+                  <div class="text-4xl mb-2">🪟</div>
+                  <h4 class="font-semibold">Windows</h4>
+                </div>
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="macOS"
+                >
+                  <div class="text-4xl mb-2">🍎</div>
+                  <h4 class="font-semibold">macOS</h4>
+                </div>
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="Linux"
+                >
+                  <div class="text-4xl mb-2">🐧</div>
+                  <h4 class="font-semibold">Linux</h4>
+                </div>
+                <div
+                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  data-value="Tidak ada preferensi"
+                >
+                  <div class="text-4xl mb-2">🤷</div>
+                  <h4 class="font-semibold">Tidak Ada Preferensi</h4>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 flex justify-center space-x-4">
+              <button
+                id="prev-btn"
+                class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg transition-colors hidden"
+              >
+                Kembali
+              </button>
+              <button
+                id="next-btn"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors"
+              >
+                Lanjut
+              </button>
+              <button
+                id="get-recommendations-btn"
+                class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-8 rounded-lg transition-colors hidden"
+              >
+                Dapatkan Rekomendasi
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section id="loading-section" class="text-center p-8 hidden">
+          <div role="status" class="flex flex-col items-center">
+            <svg
+              aria-hidden="true"
+              class="w-10 h-10 text-slate-200 animate-spin fill-blue-600"
+              viewBox="0 0 100 101"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                fill="currentColor"
+              />
+              <path
+                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0492C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5424 39.6781 93.9676 39.0409Z"
+                fill="currentFill"
+              />
+            </svg>
+            <p class="mt-4 text-lg text-slate-600">
+              AI sedang menganalisis kebutuhan Anda...
+            </p>
+          </div>
+        </section>
+
+        <section id="results-section" class="hidden fade-in">
+          <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-slate-900">
+              Rekomendasi AI Untuk Anda
+            </h2>
+            <p class="mt-3 text-lg text-slate-600 max-w-2xl mx-auto">
+              Berikut adalah laptop teratas yang cocok dengan profil Anda. Anda
+              dapat menyesuaikan anggaran untuk melihat opsi lainnya.
+            </p>
+            <button
+              id="reset-btn"
+              class="mt-4 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm"
+            >
+              Ulangi Kuesioner
+            </button>
+          </div>
+
+          <div
+            id="comparison-chart-container"
+            class="bg-white p-6 rounded-2xl shadow-md mb-8"
+          >
+            <h3 class="text-xl font-semibold text-center mb-4">
+              Grafik Perbandingan
+            </h3>
+            <div class="chart-container">
+              <canvas id="comparisonChart"></canvas>
+            </div>
+          </div>
+
+          <div
+            id="recommendations-list"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          ></div>
+
+          <div
+            id="no-results"
+            class="text-center p-8 bg-white rounded-2xl shadow-md hidden"
+          >
+            <div class="text-6xl mb-4">😔</div>
+            <h3 class="text-2xl font-bold">Tidak Ada Laptop yang Cocok</h3>
+            <p class="text-slate-600 mt-2">
+              Coba sesuaikan anggaran atau preferensi Anda untuk menemukan
+              hasil.
+            </p>
+          </div>
+        </section>
+      </main>
     </div>
+
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
