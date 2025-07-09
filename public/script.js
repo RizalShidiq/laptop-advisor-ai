@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // State Management
+  // State Management (Tidak berubah)
   const state = {
     currentStep: 1,
     userChoices: {
@@ -7,14 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
       budget_max: 20000000,
       primary_use: null,
       priorities: [],
-      os: null,
+      recommendation_count: 3,
     },
   };
 
-  const totalSteps = 4;
-  let comparisonChartInstance = null;
+  const totalSteps = 3;
+  // comparisonChartInstance Dihapus
 
-  // DOM Elements
+  // DOM Elements (Tidak berubah)
   const stepIndicatorsContainer = document.getElementById("step-indicators");
   const steps = document.querySelectorAll(".step");
   const prevBtn = document.getElementById("prev-btn");
@@ -30,9 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetBtn = document.getElementById("reset-btn");
   const budgetMinInput = document.getElementById("budget_min");
   const budgetMaxInput = document.getElementById("budget_max");
+  const recommendationCountSelect = document.getElementById(
+    "recommendation_count"
+  );
 
-  // ----- LOGIKA KUESIONER -----
-
+  // ----- LOGIKA KUESIONER (Tidak ada perubahan signifikan) -----
   function updateStepIndicators() {
     stepIndicatorsContainer.innerHTML = "";
     for (let i = 1; i <= totalSteps; i++) {
@@ -64,6 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         state.userChoices.budget_min = min;
         state.userChoices.budget_max = max;
+        state.userChoices.recommendation_count = parseInt(
+          recommendationCountSelect.value
+        );
         return true;
       case 2:
         if (!state.userChoices.primary_use) {
@@ -77,40 +82,30 @@ document.addEventListener("DOMContentLoaded", () => {
           return false;
         }
         return true;
-      case 4:
-        if (!state.userChoices.os) {
-          alert("Pilih preferensi sistem operasi.");
-          return false;
-        }
-        return true;
       default:
         return true;
     }
   }
 
+  // Event listeners (next, prev, options, reset) tidak berubah
   nextBtn.addEventListener("click", () => {
-    if (validateStep(state.currentStep)) {
-      if (state.currentStep < totalSteps) {
-        state.currentStep++;
-        showStep(state.currentStep);
-      }
+    if (validateStep(state.currentStep) && state.currentStep < totalSteps) {
+      state.currentStep++;
+      showStep(state.currentStep);
     }
   });
-
   prevBtn.addEventListener("click", () => {
     if (state.currentStep > 1) {
       state.currentStep--;
       showStep(state.currentStep);
     }
   });
-
   document.querySelectorAll(".option-card").forEach((card) => {
     card.addEventListener("click", () => {
       const question = card.parentElement.dataset.question;
       const value = card.dataset.value;
       const maxSelection =
         parseInt(card.parentElement.dataset.maxSelection) || 1;
-
       if (maxSelection > 1) {
         const priorities = state.userChoices.priorities;
         if (priorities.includes(value)) {
@@ -135,7 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-
   resetBtn.addEventListener("click", () => {
     state.currentStep = 1;
     state.userChoices = {
@@ -143,10 +137,11 @@ document.addEventListener("DOMContentLoaded", () => {
       budget_max: 20000000,
       primary_use: null,
       priorities: [],
-      os: null,
+      recommendation_count: 3,
     };
     budgetMinInput.value = 3;
     budgetMaxInput.value = 20;
+    recommendationCountSelect.value = 3;
     document
       .querySelectorAll(".option-card.selected")
       .forEach((c) => c.classList.remove("selected"));
@@ -156,15 +151,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ----- LOGIKA API & HASIL -----
-
   getRecommendationsBtn.addEventListener("click", async () => {
     if (!validateStep(state.currentStep)) return;
-
     advisorSection.classList.add("hidden");
     loadingSection.classList.remove("hidden");
-
     try {
-      // Panggil backend API
       const response = await fetch(
         "http://127.0.0.1:5000/api/get-recommendation",
         {
@@ -173,19 +164,17 @@ document.addEventListener("DOMContentLoaded", () => {
           body: JSON.stringify(state.userChoices),
         }
       );
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
           errorData.error || `HTTP error! status: ${response.status}`
         );
       }
-
       const result = await response.json();
       renderRecommendations(result.rekomendasi || []);
     } catch (error) {
       console.error("Error fetching recommendations:", error);
-      recommendationsList.innerHTML = `<p class="text-red-500 col-span-full text-center">Maaf, terjadi kesalahan: ${error.message}</p>`;
+      noResultsDiv.classList.remove("hidden");
     } finally {
       loadingSection.classList.add("hidden");
       resultsSection.classList.remove("hidden");
@@ -199,26 +188,77 @@ document.addEventListener("DOMContentLoaded", () => {
       minimumFractionDigits: 0,
     }).format(number);
   }
+  function getLogoUrl(brand) {
+    if (!brand) return "https://placehold.co/400/e2e8f0/e2e8f0?text=LOGO";
+    const normalizedBrand = brand.toLowerCase().trim();
+    let domain;
+    switch (normalizedBrand) {
+      case "apple":
+        domain = "apple.com";
+        break;
+      case "asus":
+        domain = "asus.com";
+        break;
+      case "lenovo":
+        domain = "lenovo.com";
+        break;
+      case "hp":
+        domain = "hp.com";
+        break;
+      case "dell":
+        domain = "dell.com";
+        break;
+      case "acer":
+        domain = "acer.com";
+        break;
+      case "msi":
+        domain = "msi.com";
+        break;
+      case "samsung":
+        domain = "samsung.com";
+        break;
+      case "microsoft":
+        domain = "microsoft.com";
+        break;
+      case "infinix":
+        domain = "infinixmobility.com";
+        break;
+      case "advan":
+        return "https://advan.id/wp-content/uploads/2023/11/advan_logo_2023.png";
+      default:
+        domain = `${normalizedBrand}.com`;
+    }
+    return `https://logo.clearbit.com/${domain}`;
+  }
 
   function renderRecommendations(recommendations) {
     recommendationsList.innerHTML = "";
-    noResultsDiv.classList.toggle("hidden", recommendations.length > 0);
+    const hasResults = recommendations.length > 0;
+    noResultsDiv.classList.toggle("hidden", hasResults);
 
-    if (recommendations.length > 0) {
+    if (hasResults) {
       recommendations.forEach((laptop) => {
+        const logoUrl = getLogoUrl(laptop.brand);
         const card = `
                     <div class="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col fade-in">
-                        <img src="${laptop.img_placeholder}" alt="${
-          laptop.nama
-        }" class="w-full h-48 object-cover bg-slate-200">
-                        <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-xl font-bold text-slate-900">${
+                        <div class="h-48 flex items-center justify-center p-4 bg-slate-100">
+                           <img src="${logoUrl}" alt="Logo ${
+          laptop.brand
+        }" class="max-h-20 max-w-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/400/e2e8f0/e2e8f0?text=LOGO';">
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <h3 class="text-lg font-bold text-slate-900">${
                               laptop.nama
                             }</h3>
-                            <p class="font-semibold text-blue-600 mt-1">${formatRupiah(
-                              laptop.harga
-                            )}</p>
-                            <div class="mt-4 text-sm text-slate-600 space-y-1">
+                            <div class="mt-2">
+                                <p class="font-semibold text-blue-600 text-lg">${formatRupiah(
+                                  laptop.harga
+                                )}</p>
+                                <p class="text-xs text-slate-500 italic">Sumber: ${
+                                  laptop.sumber_harga || "N/A"
+                                }</p>
+                            </div>
+                            <div class="my-4 text-xs text-slate-600 space-y-1">
                                 <p><strong>CPU:</strong> ${
                                   laptop.spesifikasi.CPU
                                 }</p>
@@ -232,75 +272,28 @@ document.addEventListener("DOMContentLoaded", () => {
                                   laptop.spesifikasi.Penyimpanan
                                 }</p>
                             </div>
-                            <div class="mt-4 bg-slate-100 p-3 rounded-lg text-sm text-slate-700 flex-grow">
-                                <p><strong>Rekomendasi AI:</strong> ${
-                                  laptop.penjelasan
-                                }</p>
+                            <div class="mt-auto">
+                               <div class="bg-slate-50 p-3 rounded-lg text-sm text-slate-700">
+                                   <p><strong>Rekomendasi AI:</strong> ${
+                                     laptop.penjelasan
+                                   }</p>
+                               </div>
+                               <a href="${
+                                 laptop.link_tokopedia
+                               }" target="_blank" rel="noopener noreferrer" class="block w-full text-center mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                                   Lihat di Tokopedia
+                               </a>
                             </div>
-                            <a href="${
-                              laptop.link_tokopedia
-                            }" target="_blank" rel="noopener noreferrer" class="block w-full text-center mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                                Lihat di Tokopedia
-                            </a>
                         </div>
                     </div>
                 `;
         recommendationsList.innerHTML += card;
       });
     }
-    updateComparisonChart(recommendations);
+    // updateComparisonChart Dihapus
   }
 
-  function updateComparisonChart(recommendations) {
-    const ctx = document.getElementById("comparisonChart").getContext("2d");
-    const labels = recommendations.map((l) => l.nama);
-    const perfData = recommendations.map((l) => l.perf_score); // Menggunakan skor dari API
-    const priceData = recommendations.map((l) => l.harga);
-
-    if (comparisonChartInstance) {
-      comparisonChartInstance.destroy();
-    }
-
-    comparisonChartInstance = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: "Skor Performa (relatif)",
-            data: perfData,
-            backgroundColor: "rgba(59, 130, 246, 0.7)",
-            borderColor: "rgba(59, 130, 246, 1)",
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        indexAxis: "y",
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: "Skor Performa (Semakin tinggi semakin baik)",
-            },
-          },
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: (context) => `Skor Performa: ${context.parsed.x}`,
-              afterLabel: (context) =>
-                `Harga: ${formatRupiah(priceData[context.dataIndex])}`,
-            },
-          },
-        },
-      },
-    });
-  }
+  // FUNGSI updateComparisonChart DIHAPUS SELURUHNYA
 
   // Inisialisasi tampilan awal
   showStep(state.currentStep);
