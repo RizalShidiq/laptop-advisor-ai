@@ -19,7 +19,7 @@ Sebuah aplikasi web berbasis AI yang membantu pengguna, terutama yang awam tekno
 - **Frontend**: HTML5, Tailwind CSS, Vanilla JavaScript
 - **Backend**: Python 3, Flask
 - **AI Engine**: Google Gemini API
-- **Deployment**: Dikonfigurasi untuk Vercel dan Netlify
+- **Deployment**: Dikonfigurasi untuk Vercel
 
 ---
 
@@ -36,7 +36,6 @@ Proyek ini dipisahkan menjadi dua bagian utama untuk kemudahan pengelolaan, sesu
 │   ├── script.js        # Logika frontend dan interaksi
 │   └── style.css        # Styling tambahan
 ├── versel.json          # Konfigurasi untuk deployment ke Vercel
-├── netlify.toml         # Konfigurasi untuk deployment ke Netlify
 ├── requirements.txt     # Daftar library Python yang dibutuhkan
 └── README.md            # File yang sedang Anda baca
 ```
@@ -95,7 +94,6 @@ Untuk menjalankan aplikasi ini di komputer Anda, ikuti langkah-langkah berikut:
 Proyek ini sudah dikonfigurasi untuk deployment yang mudah ke:
 
 - **Vercel**: Menggunakan file `vercel.json`.
-- **Netlify**: Menggunakan file `netlify.toml`.
 
 Cukup hubungkan repositori GitHub Anda ke salah satu platform tersebut dan jangan lupa untuk menambahkan `GEMINI_API_KEY` di bagian Environment Variables pada pengaturan situs.
 
