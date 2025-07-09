@@ -3,6 +3,7 @@ import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
+from serverless_wsgi import handle
 
 app = Flask(__name__)
 CORS(app)
@@ -56,3 +57,7 @@ def get_recommendation():
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({"error": str(e), "rekomendasi": []}), 500
+    
+def handler(event, context):
+    """Fungsi ini adalah pintu masuk untuk Netlify Functions."""
+    return handle(app, event, context)
