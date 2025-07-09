@@ -9,8 +9,10 @@ CORS(app)
 
 # --- Konfigurasi Client untuk Google Gemini ---
 try:
-    api_key = os.environ.get("GEMINI_API_KEY", "AIzaSyAPn_0bwPgkdmIJIgOsjz_3zf9ZimQc_2g")
+    # Kode ini akan mencari Environment Variable bernama 'GEMINI_API_KEY' di server Vercel
+    api_key = os.environ.get("GEMINI_API_KEY")
     genai.configure(api_key=api_key)
+    print("Gemini API Key loaded successfully.")
 except Exception as e:
     print(f"Error configuring Gemini API: {e}")
 

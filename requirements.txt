@@ -1,2 +1,7 @@
 Flask
 google-generativeai
+flask-cors
+pandas
+scikit-learn
+joblib
+numpy
