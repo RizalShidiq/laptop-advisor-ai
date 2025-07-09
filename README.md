@@ -35,7 +35,7 @@ Proyek ini dipisahkan menjadi dua bagian utama untuk kemudahan pengelolaan, sesu
 │   ├── index.html       # Halaman utama aplikasi
 │   ├── script.js        # Logika frontend dan interaksi
 │   └── style.css        # Styling tambahan
-├── versel.json          # Konfigurasi untuk deployment ke Netlify
+├── versel.json          # Konfigurasi untuk deployment ke Vercel
 ├── requirements.txt     # Daftar library Python yang dibutuhkan
 └── README.md            # File yang sedang Anda baca
 ```
