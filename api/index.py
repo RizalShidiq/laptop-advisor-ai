@@ -49,7 +49,7 @@ def get_recommendation():
         4. Pastikan outputnya adalah objek JSON tunggal dengan kunci "rekomendasi".
         """
         
-        model = genai.GenerativeModel('gemini-1.5-flash-latest', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
+        model = genai.GenerativeModel('gemini-3.1-pro-preview', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
         response = model.generate_content(prompt_template)
         return response.text, 200, {'Content-Type': 'application/json'}
 
