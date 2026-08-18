@@ -47,7 +47,9 @@ def get_recommendation():
         3. Untuk setiap laptop, berikan:
            - "nama": Nama lengkap laptop.
            - "brand": Nama merek (contoh: "asus", "lenovo", "apple", "acer", "hp", "dell", "msi").
-           - "harga": Estimasi harga dalam Rupiah (angka bilangan bulat murni).
+           - "harga": Estimasi rentang harga (contoh: "10.000.000 - 12.000.000").
+           - "harga_min": Estimasi harga terendah dalam Rupiah (angka bilangan bulat murni, contoh: 10000000).
+           - "harga_max": Estimasi harga tertinggi dalam Rupiah (angka bilangan bulat murni, contoh: 12000000).
            - "sumber_harga": Sumber pengecekan harga dan tanggal (Contoh: "Tokopedia, 2025").
            - "spesifikasi": Objek JSON berisi "CPU", "GPU", "RAM", "Penyimpanan".
            - "skor": Objek JSON nilai 1-10 (boleh desimal seperti 8.5) untuk evaluasi metrik:

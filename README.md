@@ -140,7 +140,7 @@ Menerima kriteria preferensi pengguna dan mengembalikan daftar rekomendasi lapto
     {
       "nama": "Lenovo LOQ 15IAX9",
       "brand": "lenovo",
-      "harga": 12499000,
+      "harga": "12.000.000 - 13.500.000",
       "sumber_harga": "Tokopedia, 2025",
       "spesifikasi": {
         "CPU": "Intel Core i5-12450HX",

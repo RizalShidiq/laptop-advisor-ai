@@ -221,13 +221,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  function formatRupiah(number) {
-    if (!number || isNaN(number)) return "Harga Menyesuaikan";
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(number);
+  function formatHargaRange(laptop) {
+    if (!laptop) return "Harga Menyesuaikan";
+
+    // 1. Jika ada harga_min dan harga_max eksplisit (angka)
+    if (laptop.harga_min && laptop.harga_max && !isNaN(laptop.harga_min) && !isNaN(laptop.harga_max)) {
+      const minStr = new Intl.NumberFormat("id-ID").format(laptop.harga_min);
+      const maxStr = new Intl.NumberFormat("id-ID").format(laptop.harga_max);
+      return `Rp ${minStr} - ${maxStr}`;
+    }
+
+    // 2. Jika harga adalah string yang memuat rentang harga
+    const hargaVal = laptop.rentang_harga || laptop.harga;
+    if (typeof hargaVal === "string" && hargaVal.trim() !== "") {
+      let clean = hargaVal.trim();
+      if (!clean.toLowerCase().startsWith("rp")) {
+        clean = `Rp ${clean}`;
+      }
+      return clean;
+    }
+
+    // 3. Jika harga adalah angka tunggal
+    if (typeof hargaVal === "number" && !isNaN(hargaVal) && hargaVal > 0) {
+      const min = Math.floor((hargaVal * 0.95) / 100000) * 100000;
+      const max = Math.ceil((hargaVal * 1.05) / 100000) * 100000;
+      const minStr = new Intl.NumberFormat("id-ID").format(min);
+      const maxStr = new Intl.NumberFormat("id-ID").format(max);
+      return `Rp ${minStr} - ${maxStr}`;
+    }
+
+    return "Harga Menyesuaikan";
   }
 
   function getLogoUrl(brand) {
@@ -316,7 +339,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
               <div class="sm:text-right flex-shrink-0">
                 <p class="font-extrabold text-primary dark:text-blue-400 text-lg">
-                  ${formatRupiah(laptop.harga)}
+                  ${formatHargaRange(laptop)}
                 </p>
                 <p class="text-[11px] text-slate-400 dark:text-slate-400 italic">
                   ${laptop.sumber_harga || "Marketplace ID"}
