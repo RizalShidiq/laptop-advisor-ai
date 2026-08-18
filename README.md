@@ -6,38 +6,37 @@ Sebuah aplikasi web berbasis AI yang membantu pengguna, terutama yang awam tekno
 
 ## ✨ Fitur Utama
 
-- **Kuesioner Interaktif**: Pengguna dipandu melalui serangkaian pertanyaan sederhana mengenai anggaran, tujuan penggunaan, dan prioritas utama (performa, portabilitas, baterai).
-- **Rekomendasi Berbasis AI**: Menggunakan kekuatan Google Gemini API untuk menganalisis jawaban pengguna dan memberikan rekomendasi laptop yang paling relevan dari pasar saat ini.
-- **Hasil yang Dipersonalisasi**: Menampilkan 3-5 kartu rekomendasi, lengkap dengan logo merek, spesifikasi utama, penjelasan singkat dari AI, dan tautan langsung ke e-commerce.
-- **Desain Responsif**: Tampilan yang dioptimalkan untuk kenyamanan penggunaan di berbagai perangkat, mulai dari desktop hingga ponsel.
-- **Transparansi Harga**: Menyertakan keterangan sumber estimasi harga untuk memberikan konteks yang lebih baik kepada pengguna.
+- **Dashboard Interaktif Satu Halaman (2-Kolom)**: Seluruh formulir preferensi (anggaran, kegunaan, prioritas) berada di panel sebelah kiri, sementara hasil analisis, kartu rekomendasi, dan grafik perbandingan ditampilkan seketika di panel sebelah kanan.
+- **Rekomendasi Berbasis AI**: Menggunakan kekuatan Google Gemini API untuk menganalisis kebutuhan dan memberikan rekomendasi laptop paling relevan dari pasar Indonesia.
+- **Bagan Perbandingan Interaktif (Chart.js)**: Menyajikan grafik metrik multi-dimensi (**Radar Chart** & **Bar Chart**) untuk membandingkan Performa, Portabilitas, Daya Tahan Baterai, Kualitas Layar, dan *Value for Money*.
+- **Skeleton Shimmer Loading**: Tampilan placeholder animasi modern saat AI memproses data rekomendasi.
+- **Dukungan Dark Mode**: Opsi tema Gelap dan Terang yang nyaman di mata dengan persistensi preferensi di `localStorage`.
+- **Hasil Terpersonalisasi**: Menampilkan kartu rekomendasi lengkap dengan logo merek, spesifikasi teknis (CPU, GPU, RAM, Penyimpanan), ulasan singkat AI, estimasi harga, dan tautan langsung ke Tokopedia.
 
 ---
 
 ## 🛠️ Teknologi yang Digunakan
 
-- **Frontend**: HTML5, Tailwind CSS, Vanilla JavaScript
-- **Backend**: Python 3, Flask
-- **AI Engine**: Google Gemini API
-- **Deployment**: Dikonfigurasi untuk Vercel
+- **Frontend**: HTML5, Tailwind CSS, Vanilla JavaScript, Chart.js
+- **Backend**: Python 3, Flask, CORS
+- **AI Engine**: Google Gemini API via **Google GenAI SDK** (`google-genai` & `gemini-2.5-flash`)
+- **Deployment**: Serverless Architecture di Vercel
 
 ---
 
 ## 📂 Struktur Proyek
 
-Proyek ini dipisahkan menjadi dua bagian utama untuk kemudahan pengelolaan, sesuai dengan praktik terbaik untuk deployment di platform seperti Netlify/Vercel.
-
 ```
 /
 ├── api/
-│   └── index.py         # Backend Flask & Logika panggilan ke Gemini API
+│   └── index.py         # Backend Flask & pemrosesan prompt terstruktur ke Gemini API
 ├── public/
-│   ├── index.html       # Halaman utama aplikasi
-│   ├── script.js        # Logika frontend dan interaksi
-│   └── style.css        # Styling tambahan
-├── versel.json          # Konfigurasi untuk deployment ke Vercel
-├── requirements.txt     # Daftar library Python yang dibutuhkan
-└── README.md            # File yang sedang Anda baca
+│   ├── index.html       # Antarmuka web utama (UI kuesioner, dark mode, chart container)
+│   ├── script.js        # State management, Chart.js rendering, dark mode logic, & API fetch
+│   └── style.css        # Animasi shimmer skeleton, transisi tema, dan custom styling
+├── vercel.json          # Konfigurasi routing & deployment serverless Vercel
+├── requirements.txt     # Daftar dependensi Python
+└── README.md            # Dokumentasi proyek & panduan instalasi
 ```
 
 ---

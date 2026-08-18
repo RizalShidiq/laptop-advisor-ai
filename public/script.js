@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // State Management (Tidak berubah)
+  // State Management
   const state = {
-    currentStep: 1,
     userChoices: {
       budget_min: 3000000,
       budget_max: 20000000,
@@ -11,102 +10,97 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   };
 
-  const totalSteps = 3;
-  // comparisonChartInstance Dihapus
+  let comparisonChartInstance = null;
+  let currentRecommendations = [];
+  let currentChartType = "radar"; // 'radar' or 'bar'
 
-  // DOM Elements (Tidak berubah)
-  const stepIndicatorsContainer = document.getElementById("step-indicators");
-  const steps = document.querySelectorAll(".step");
-  const prevBtn = document.getElementById("prev-btn");
-  const nextBtn = document.getElementById("next-btn");
-  const getRecommendationsBtn = document.getElementById(
-    "get-recommendations-btn"
-  );
-  const advisorSection = document.getElementById("advisor-section");
+  // DOM Elements
+  const budgetMinInput = document.getElementById("budget_min");
+  const budgetMaxInput = document.getElementById("budget_max");
+  const recommendationCountInput = document.getElementById("recommendation_count");
+  const recCountBtns = document.querySelectorAll(".rec-count-btn");
+  const getRecommendationsBtn = document.getElementById("get-recommendations-btn");
+  const resetBtn = document.getElementById("reset-btn");
+
+  const emptyState = document.getElementById("empty-state");
   const loadingSection = document.getElementById("loading-section");
   const resultsSection = document.getElementById("results-section");
   const recommendationsList = document.getElementById("recommendations-list");
   const noResultsDiv = document.getElementById("no-results");
-  const resetBtn = document.getElementById("reset-btn");
-  const budgetMinInput = document.getElementById("budget_min");
-  const budgetMaxInput = document.getElementById("budget_max");
-  const recommendationCountSelect = document.getElementById(
-    "recommendation_count"
-  );
+  const chartSection = document.getElementById("chart-section");
 
-  // ----- LOGIKA KUESIONER (Tidak ada perubahan signifikan) -----
-  function updateStepIndicators() {
-    stepIndicatorsContainer.innerHTML = "";
-    for (let i = 1; i <= totalSteps; i++) {
-      const indicator = document.createElement("div");
-      indicator.className = `step-indicator w-8 h-2 rounded-full ${
-        i <= state.currentStep ? "bg-blue-600" : "bg-slate-200"
-      }`;
-      stepIndicatorsContainer.appendChild(indicator);
+  // Theme Toggle Elements
+  const themeToggleBtn = document.getElementById("theme-toggle");
+  const themeToggleLightIcon = document.getElementById("theme-toggle-light-icon");
+  const themeToggleDarkIcon = document.getElementById("theme-toggle-dark-icon");
+  const themeToggleText = document.getElementById("theme-toggle-text");
+
+  // Chart Switcher Elements
+  const chartRadarBtn = document.getElementById("chart-radar-btn");
+  const chartBarBtn = document.getElementById("chart-bar-btn");
+
+  // ----- THEME MANAGEMENT (DARK / LIGHT MODE) -----
+  function updateThemeUI(isDark) {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+      if (themeToggleLightIcon) themeToggleLightIcon.classList.remove("hidden");
+      if (themeToggleDarkIcon) themeToggleDarkIcon.classList.add("hidden");
+      if (themeToggleText) themeToggleText.textContent = "Terang";
+    } else {
+      document.documentElement.classList.remove("dark");
+      if (themeToggleLightIcon) themeToggleLightIcon.classList.add("hidden");
+      if (themeToggleDarkIcon) themeToggleDarkIcon.classList.remove("hidden");
+      if (themeToggleText) themeToggleText.textContent = "Gelap";
     }
   }
 
-  function showStep(stepNumber) {
-    steps.forEach((step) => step.classList.add("hidden"));
-    document.getElementById(`step-${stepNumber}`).classList.remove("hidden");
-    prevBtn.classList.toggle("hidden", stepNumber === 1);
-    nextBtn.classList.toggle("hidden", stepNumber === totalSteps);
-    getRecommendationsBtn.classList.toggle("hidden", stepNumber !== totalSteps);
-    updateStepIndicators();
+  function initTheme() {
+    const isDark =
+      localStorage.getItem("theme") === "dark" ||
+      (!("theme" in localStorage) &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+    updateThemeUI(isDark);
   }
 
-  function validateStep(stepNumber) {
-    switch (stepNumber) {
-      case 1:
-        const min = parseInt(budgetMinInput.value) * 1000000;
-        const max = parseInt(budgetMaxInput.value) * 1000000;
-        if (isNaN(min) || isNaN(max) || min < 0 || max <= min) {
-          alert("Masukkan rentang anggaran yang valid.");
-          return false;
-        }
-        state.userChoices.budget_min = min;
-        state.userChoices.budget_max = max;
-        state.userChoices.recommendation_count = parseInt(
-          recommendationCountSelect.value
-        );
-        return true;
-      case 2:
-        if (!state.userChoices.primary_use) {
-          alert("Pilih penggunaan utama.");
-          return false;
-        }
-        return true;
-      case 3:
-        if (state.userChoices.priorities.length === 0) {
-          alert("Pilih setidaknya satu prioritas.");
-          return false;
-        }
-        return true;
-      default:
-        return true;
-    }
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", () => {
+      const isCurrentlyDark = document.documentElement.classList.contains("dark");
+      const newTheme = isCurrentlyDark ? "light" : "dark";
+      localStorage.setItem("theme", newTheme);
+      updateThemeUI(!isCurrentlyDark);
+
+      // Re-render chart jika ada rekomendasi yang sedang ditampilkan
+      if (currentRecommendations.length > 0) {
+        renderComparisonChart(currentRecommendations, currentChartType);
+      }
+    });
   }
 
-  // Event listeners (next, prev, options, reset) tidak berubah
-  nextBtn.addEventListener("click", () => {
-    if (validateStep(state.currentStep) && state.currentStep < totalSteps) {
-      state.currentStep++;
-      showStep(state.currentStep);
-    }
+  initTheme();
+
+  // ----- FORM INTERACTION LOGIC -----
+
+  // 1. Recommendation Count Selection
+  recCountBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      recCountBtns.forEach((b) => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      const count = parseInt(btn.dataset.value) || 3;
+      recommendationCountInput.value = count;
+      state.userChoices.recommendation_count = count;
+    });
   });
-  prevBtn.addEventListener("click", () => {
-    if (state.currentStep > 1) {
-      state.currentStep--;
-      showStep(state.currentStep);
-    }
-  });
+
+  // 2. Primary Use & Priorities Option Cards
   document.querySelectorAll(".option-card").forEach((card) => {
     card.addEventListener("click", () => {
-      const question = card.parentElement.dataset.question;
+      const parent = card.parentElement;
+      const question = parent.dataset.question;
       const value = card.dataset.value;
-      const maxSelection =
-        parseInt(card.parentElement.dataset.maxSelection) || 1;
+      const maxSelection = parseInt(parent.dataset.maxSelection) || 1;
+
       if (maxSelection > 1) {
+        // Multi-select (Priorities)
         const priorities = state.userChoices.priorities;
         if (priorities.includes(value)) {
           state.userChoices.priorities = priorities.filter((p) => p !== value);
@@ -116,22 +110,46 @@ document.addEventListener("DOMContentLoaded", () => {
             state.userChoices.priorities.push(value);
             card.classList.add("selected");
           } else {
-            alert(
-              `Anda hanya bisa memilih maksimal ${maxSelection} prioritas.`
-            );
+            alert(`Anda hanya dapat memilih maksimal ${maxSelection} prioritas.`);
           }
         }
       } else {
+        // Single-select (Primary Use)
         state.userChoices[question] = value;
-        card.parentElement
-          .querySelectorAll(".option-card")
-          .forEach((c) => c.classList.remove("selected"));
+        parent.querySelectorAll(".option-card").forEach((c) => c.classList.remove("selected"));
         card.classList.add("selected");
       }
     });
   });
+
+  // 3. Form Validation
+  function validateForm() {
+    const min = parseInt(budgetMinInput.value) * 1000000;
+    const max = parseInt(budgetMaxInput.value) * 1000000;
+
+    if (isNaN(min) || isNaN(max) || min < 1000000 || max <= min) {
+      alert("Masukkan rentang anggaran yang valid (Maksimum harus lebih besar dari Minimum).");
+      return false;
+    }
+    state.userChoices.budget_min = min;
+    state.userChoices.budget_max = max;
+    state.userChoices.recommendation_count = parseInt(recommendationCountInput.value) || 3;
+
+    if (!state.userChoices.primary_use) {
+      alert("Silakan pilih salah satu kategori Penggunaan Utama.");
+      return false;
+    }
+
+    if (state.userChoices.priorities.length === 0) {
+      alert("Silakan pilih setidaknya satu Prioritas Utama.");
+      return false;
+    }
+
+    return true;
+  }
+
+  // 4. Reset Button
   resetBtn.addEventListener("click", () => {
-    state.currentStep = 1;
     state.userChoices = {
       budget_min: 3000000,
       budget_max: 20000000,
@@ -139,54 +157,81 @@ document.addEventListener("DOMContentLoaded", () => {
       priorities: [],
       recommendation_count: 3,
     };
+
     budgetMinInput.value = 3;
     budgetMaxInput.value = 20;
-    recommendationCountSelect.value = 3;
-    document
-      .querySelectorAll(".option-card.selected")
-      .forEach((c) => c.classList.remove("selected"));
-    resultsSection.classList.add("hidden");
-    advisorSection.classList.remove("hidden");
-    showStep(1);
+    recommendationCountInput.value = 3;
+
+    recCountBtns.forEach((b, idx) => {
+      b.classList.toggle("selected", idx === 0);
+    });
+
+    document.querySelectorAll(".option-card.selected").forEach((c) => c.classList.remove("selected"));
+
+    currentRecommendations = [];
+    if (comparisonChartInstance) {
+      comparisonChartInstance.destroy();
+      comparisonChartInstance = null;
+    }
+
+    // Switch back to empty state
+    if (resultsSection) resultsSection.classList.add("hidden");
+    if (loadingSection) loadingSection.classList.add("hidden");
+    if (emptyState) emptyState.classList.remove("hidden");
   });
 
-  // ----- LOGIKA API & HASIL -----
+  // ----- API CALL & RENDERING -----
   getRecommendationsBtn.addEventListener("click", async () => {
-    if (!validateStep(state.currentStep)) return;
-    advisorSection.classList.add("hidden");
-    loadingSection.classList.remove("hidden");
+    if (!validateForm()) return;
+
+    // Show loading state
+    if (emptyState) emptyState.classList.add("hidden");
+    if (resultsSection) resultsSection.classList.add("hidden");
+    if (loadingSection) loadingSection.classList.remove("hidden");
+
+    // Scroll slightly on mobile if needed
+    if (window.innerWidth < 1024) {
+      const resultsPanel = document.getElementById("results-panel");
+      if (resultsPanel) resultsPanel.scrollIntoView({ behavior: "smooth" });
+    }
+
     try {
       const response = await fetch("/api/get-recommendation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(state.userChoices),
       });
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.error || `HTTP error! status: ${response.status}`
-        );
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
+
       const result = await response.json();
-      renderRecommendations(result.rekomendasi || []);
+      currentRecommendations = result.rekomendasi || [];
+      renderRecommendations(currentRecommendations);
+      renderComparisonChart(currentRecommendations, currentChartType);
     } catch (error) {
       console.error("Error fetching recommendations:", error);
-      noResultsDiv.classList.remove("hidden");
+      currentRecommendations = [];
+      renderRecommendations([]);
     } finally {
-      loadingSection.classList.add("hidden");
-      resultsSection.classList.remove("hidden");
+      if (loadingSection) loadingSection.classList.add("hidden");
+      if (resultsSection) resultsSection.classList.remove("hidden");
     }
   });
 
   function formatRupiah(number) {
+    if (!number || isNaN(number)) return "Harga Menyesuaikan";
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 0,
     }).format(number);
   }
+
   function getLogoUrl(brand) {
-    if (!brand) return "https://placehold.co/400/e2e8f0/e2e8f0?text=LOGO";
+    if (!brand) return "https://placehold.co/400/e2e8f0/64748b?text=LAPTOP";
     const normalizedBrand = brand.toLowerCase().trim();
     let domain;
     switch (normalizedBrand) {
@@ -194,18 +239,22 @@ document.addEventListener("DOMContentLoaded", () => {
         domain = "apple.com";
         break;
       case "asus":
+      case "rog":
         domain = "asus.com";
         break;
       case "lenovo":
+      case "legion":
         domain = "lenovo.com";
         break;
       case "hp":
         domain = "hp.com";
         break;
       case "dell":
+      case "alienware":
         domain = "dell.com";
         break;
       case "acer":
+      case "predator":
         domain = "acer.com";
         break;
       case "msi":
@@ -222,6 +271,8 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
       case "advan":
         return "https://advan.id/wp-content/uploads/2023/11/advan_logo_2023.png";
+      case "axioo":
+        return "https://axiooworld.com/wp-content/uploads/2020/09/Logo-Axioo.png";
       default:
         domain = `${normalizedBrand}.com`;
     }
@@ -230,68 +281,278 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderRecommendations(recommendations) {
     recommendationsList.innerHTML = "";
-    const hasResults = recommendations.length > 0;
+    const hasResults = recommendations && recommendations.length > 0;
     noResultsDiv.classList.toggle("hidden", hasResults);
+    chartSection.classList.toggle("hidden", !hasResults);
 
     if (hasResults) {
-      recommendations.forEach((laptop) => {
+      recommendations.forEach((laptop, index) => {
         const logoUrl = getLogoUrl(laptop.brand);
+        const tokolink =
+          laptop.link_tokopedia ||
+          `https://www.tokopedia.com/search?q=${encodeURIComponent(laptop.nama)}`;
+
         const card = `
-                    <div class="bg-white rounded-2xl shadow-md overflow-hidden flex flex-col fade-in">
-                        <div class="h-48 flex items-center justify-center p-4 bg-slate-100">
-                           <img src="${logoUrl}" alt="Logo ${
-          laptop.brand
-        }" class="max-h-20 max-w-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/400/e2e8f0/e2e8f0?text=LOGO';">
-                        </div>
-                        <div class="p-5 flex flex-col flex-grow">
-                            <h3 class="text-lg font-bold text-slate-900">${
-                              laptop.nama
-                            }</h3>
-                            <div class="mt-2">
-                                <p class="font-semibold text-blue-600 text-lg">${formatRupiah(
-                                  laptop.harga
-                                )}</p>
-                                <p class="text-xs text-slate-500 italic">Sumber: ${
-                                  laptop.sumber_harga || "N/A"
-                                }</p>
-                            </div>
-                            <div class="my-4 text-xs text-slate-600 space-y-1">
-                                <p><strong>CPU:</strong> ${
-                                  laptop.spesifikasi.CPU
-                                }</p>
-                                <p><strong>GPU:</strong> ${
-                                  laptop.spesifikasi.GPU
-                                }</p>
-                                <p><strong>RAM:</strong> ${
-                                  laptop.spesifikasi.RAM
-                                }</p>
-                                <p><strong>Penyimpanan:</strong> ${
-                                  laptop.spesifikasi.Penyimpanan
-                                }</p>
-                            </div>
-                            <div class="mt-auto">
-                               <div class="bg-slate-50 p-3 rounded-lg text-sm text-slate-700">
-                                   <p><strong>Rekomendasi AI:</strong> ${
-                                     laptop.penjelasan
-                                   }</p>
-                               </div>
-                               <a href="${
-                                 laptop.link_tokopedia
-                               }" target="_blank" rel="noopener noreferrer" class="block w-full text-center mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                                   Lihat di Tokopedia
-                               </a>
-                            </div>
-                        </div>
-                    </div>
-                `;
+          <div class="bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark p-5 shadow-sm hover:shadow-md transition-all duration-200 fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border-light dark:border-border-dark">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-700/60 p-2 flex items-center justify-center border border-border-light dark:border-border-dark flex-shrink-0">
+                  <img
+                    src="${logoUrl}"
+                    alt="Logo ${laptop.brand || 'Laptop'}"
+                    class="max-h-8 max-w-full object-contain filter dark:brightness-110"
+                    onerror="this.onerror=null; this.src='https://placehold.co/100/e2e8f0/475569?text=${encodeURIComponent(laptop.brand || 'LAPTOP')}';"
+                  />
+                </div>
+                <div>
+                  <span class="inline-block px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-primary dark:text-blue-300 font-bold text-[10px] uppercase tracking-wider mb-1">
+                    Pilihan #${index + 1}
+                  </span>
+                  <h3 class="font-bold text-slate-900 dark:text-white text-base leading-snug">
+                    ${laptop.nama}
+                  </h3>
+                </div>
+              </div>
+
+              <div class="sm:text-right flex-shrink-0">
+                <p class="font-extrabold text-primary dark:text-blue-400 text-lg">
+                  ${formatRupiah(laptop.harga)}
+                </p>
+                <p class="text-[11px] text-slate-400 dark:text-slate-400 italic">
+                  ${laptop.sumber_harga || "Marketplace ID"}
+                </p>
+              </div>
+            </div>
+
+            <!-- Technical Specifications Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 my-4">
+              <div class="bg-slate-50 dark:bg-slate-700/40 p-2.5 rounded-xl border border-border-light dark:border-border-dark">
+                <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">CPU</span>
+                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-1" title="${laptop.spesifikasi?.CPU || '-'}">${laptop.spesifikasi?.CPU || "-"}</span>
+              </div>
+              <div class="bg-slate-50 dark:bg-slate-700/40 p-2.5 rounded-xl border border-border-light dark:border-border-dark">
+                <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">GPU</span>
+                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-1" title="${laptop.spesifikasi?.GPU || '-'}">${laptop.spesifikasi?.GPU || "-"}</span>
+              </div>
+              <div class="bg-slate-50 dark:bg-slate-700/40 p-2.5 rounded-xl border border-border-light dark:border-border-dark">
+                <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">RAM</span>
+                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-1" title="${laptop.spesifikasi?.RAM || '-'}">${laptop.spesifikasi?.RAM || "-"}</span>
+              </div>
+              <div class="bg-slate-50 dark:bg-slate-700/40 p-2.5 rounded-xl border border-border-light dark:border-border-dark">
+                <span class="text-[10px] uppercase font-bold text-slate-400 block mb-0.5">Storage</span>
+                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200 line-clamp-1" title="${laptop.spesifikasi?.Penyimpanan || '-'}">${laptop.spesifikasi?.Penyimpanan || "-"}</span>
+              </div>
+            </div>
+
+            <!-- AI Verdict Box -->
+            <div class="bg-blue-50/60 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/30 p-3.5 rounded-xl mb-4">
+              <p class="text-xs font-bold text-primary dark:text-blue-300 flex items-center gap-1 mb-1">
+                <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                <span>Analisis AI:</span>
+              </p>
+              <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                ${laptop.penjelasan || "Pilihan optimal sesuai dengan profil anggaran dan kebutuhan Anda."}
+              </p>
+            </div>
+
+            <!-- CTA Button -->
+            <div>
+              <a
+                href="${tokolink}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="flex items-center justify-center gap-1.5 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl shadow-sm hover:shadow transition-all text-xs"
+              >
+                <span class="material-symbols-outlined text-base">shopping_cart</span>
+                <span>Cek Harga & Beli di Tokopedia</span>
+              </a>
+            </div>
+          </div>
+        `;
         recommendationsList.innerHTML += card;
       });
     }
-    // updateComparisonChart Dihapus
   }
 
-  // FUNGSI updateComparisonChart DIHAPUS SELURUHNYA
+  // ----- COMPARISON CHART (CHART.JS) -----
+  const colorPalette = [
+    { bg: "rgba(0, 88, 190, 0.25)", border: "#0058be" },     // Blue
+    { bg: "rgba(16, 185, 129, 0.25)", border: "#10b981" },   // Emerald
+    { bg: "rgba(249, 115, 22, 0.25)", border: "#f97316" },   // Orange
+    { bg: "rgba(168, 85, 247, 0.25)", border: "#a855f7" },   // Purple
+    { bg: "rgba(236, 72, 153, 0.25)", border: "#ec4899" },   // Pink
+  ];
 
-  // Inisialisasi tampilan awal
-  showStep(state.currentStep);
+  function getMetricsFromLaptop(laptop, index) {
+    if (laptop.skor && typeof laptop.skor === "object") {
+      return [
+        laptop.skor.performa ?? 8.0,
+        laptop.skor.portabilitas ?? 7.5,
+        laptop.skor.baterai ?? 7.5,
+        laptop.skor.layar ?? 8.0,
+        laptop.skor.value ?? 8.5,
+      ];
+    }
+    const base = 7 + (index === 0 ? 1.5 : index === 1 ? 1.0 : 0.5);
+    return [
+      Math.min(9.5, base + (Math.random() * 1.5 - 0.7)),
+      Math.min(9.5, base + (Math.random() * 1.5 - 0.7)),
+      Math.min(9.5, base + (Math.random() * 1.5 - 0.7)),
+      Math.min(9.5, base + (Math.random() * 1.5 - 0.7)),
+      Math.min(9.5, base + (Math.random() * 1.5 - 0.7)),
+    ].map((val) => Number(val.toFixed(1)));
+  }
+
+  function renderComparisonChart(recommendations, type = "radar") {
+    const canvas = document.getElementById("comparisonChart");
+    if (!canvas || !recommendations || recommendations.length === 0) return;
+
+    if (comparisonChartInstance) {
+      comparisonChartInstance.destroy();
+      comparisonChartInstance = null;
+    }
+
+    const isDarkMode = document.documentElement.classList.contains("dark");
+    const textColor = isDarkMode ? "#cbd5e1" : "#475569";
+    const gridColor = isDarkMode ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.07)";
+
+    const labels = [
+      "Performa",
+      "Portabilitas",
+      "Daya Baterai",
+      "Kualitas Layar",
+      "Value for Money",
+    ];
+
+    const datasets = recommendations.map((laptop, i) => {
+      const palette = colorPalette[i % colorPalette.length];
+      const data = getMetricsFromLaptop(laptop, i);
+      const shortName = laptop.nama.length > 20 ? laptop.nama.substring(0, 18) + "..." : laptop.nama;
+
+      return {
+        label: shortName,
+        data: data,
+        backgroundColor: palette.bg,
+        borderColor: palette.border,
+        borderWidth: 2,
+        pointBackgroundColor: palette.border,
+        pointBorderColor: "#fff",
+        pointHoverBackgroundColor: "#fff",
+        pointHoverBorderColor: palette.border,
+        pointRadius: 3.5,
+      };
+    });
+
+    const ctx = canvas.getContext("2d");
+
+    if (type === "radar") {
+      comparisonChartInstance = new Chart(ctx, {
+        type: "radar",
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "top",
+              labels: {
+                color: textColor,
+                font: { family: "Inter", size: 11, weight: "600" },
+                padding: 12,
+                usePointStyle: true,
+              },
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ${ctx.dataset.label}: ${ctx.formattedValue} / 10`,
+              },
+            },
+          },
+          scales: {
+            r: {
+              min: 0,
+              max: 10,
+              ticks: {
+                stepSize: 2,
+                color: textColor,
+                backdropColor: "transparent",
+                font: { size: 9 },
+              },
+              grid: { color: gridColor },
+              angleLines: { color: gridColor },
+              pointLabels: {
+                color: textColor,
+                font: { family: "Inter", size: 11, weight: "600" },
+              },
+            },
+          },
+        },
+      });
+    } else {
+      comparisonChartInstance = new Chart(ctx, {
+        type: "bar",
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: "top",
+              labels: {
+                color: textColor,
+                font: { family: "Inter", size: 11, weight: "600" },
+                padding: 12,
+                usePointStyle: true,
+              },
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` ${ctx.dataset.label}: ${ctx.formattedValue} / 10`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              grid: { color: gridColor },
+              ticks: {
+                color: textColor,
+                font: { family: "Inter", size: 11, weight: "600" },
+              },
+            },
+            y: {
+              min: 0,
+              max: 10,
+              ticks: { stepSize: 2, color: textColor },
+              grid: { color: gridColor },
+            },
+          },
+        },
+      });
+    }
+  }
+
+  // Chart Switcher Buttons
+  if (chartRadarBtn && chartBarBtn) {
+    chartRadarBtn.addEventListener("click", () => {
+      currentChartType = "radar";
+      chartRadarBtn.className =
+        "px-3 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-slate-800 text-primary dark:text-blue-400 shadow-sm transition-all cursor-pointer";
+      chartBarBtn.className =
+        "px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer";
+      if (currentRecommendations.length > 0) {
+        renderComparisonChart(currentRecommendations, "radar");
+      }
+    });
+
+    chartBarBtn.addEventListener("click", () => {
+      currentChartType = "bar";
+      chartBarBtn.className =
+        "px-3 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-slate-800 text-primary dark:text-blue-400 shadow-sm transition-all cursor-pointer";
+      chartRadarBtn.className =
+        "px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer";
+      if (currentRecommendations.length > 0) {
+        renderComparisonChart(currentRecommendations, "bar");
+      }
+    });
+  }
 });

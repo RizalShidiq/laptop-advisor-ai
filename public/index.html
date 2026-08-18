@@ -1,281 +1,418 @@
 <!DOCTYPE html>
 <html lang="id">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Laptop Advisor AI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Laptop Advisor AI — Rekomendasi Laptop Cerdas Berbasis AI</title>
+    <!-- Dark Mode Immediate Script to avoid flash -->
+    <script>
+      if (
+        localStorage.getItem("theme") === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    </script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#0058be",
+              "primary-container": "#2170e4",
+              "primary-fixed": "#d8e2ff",
+              "on-primary-fixed": "#001a42",
+              secondary: "#006c49",
+              "secondary-container": "#10b981",
+              "bg-light": "#f8fafc",
+              "card-light": "#ffffff",
+              "border-light": "#e2e8f0",
+              "bg-dark": "#0f172a",
+              "card-dark": "#1e293b",
+              "border-dark": "#334155",
+              "surface-container": "#eff4ff",
+              "surface-variant": "#d3e4fe",
+              "on-surface-variant": "#64748b",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body class="bg-slate-50 text-slate-800">
-    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
-      <header class="text-center mb-12">
-        <h1 class="text-3xl md:text-5xl font-bold text-slate-900">
-          Laptop Advisor <span class="text-blue-600">AI</span>
-        </h1>
-        <p class="mt-4 text-base md:text-lg text-slate-600 max-w-2xl mx-auto">
-          Temukan laptop sempurna untuk Anda. Jawab beberapa pertanyaan dan
-          biarkan AI kami yang bekerja.
-        </p>
-      </header>
+  <body class="bg-bg-light dark:bg-bg-dark text-slate-800 dark:text-slate-100 min-h-screen pt-16 flex flex-col font-sans">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-white/90 dark:bg-card-dark/90 backdrop-blur-md border-b border-border-light dark:border-border-dark fixed top-0 left-0 w-full z-50 flex justify-between items-center px-4 md:px-8 h-16 transition-colors">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center shadow-sm">
+          <span class="material-symbols-outlined text-2xl">laptop_mac</span>
+        </div>
+        <div>
+          <span class="font-extrabold text-lg md:text-xl text-slate-900 dark:text-white tracking-tight">
+            Laptop Advisor <span class="text-primary dark:text-blue-400">AI</span>
+          </span>
+          <span class="hidden sm:inline-block ml-2 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/70 text-primary dark:text-blue-300 text-xs font-semibold uppercase tracking-wider">
+            Gemini Powered
+          </span>
+        </div>
+      </div>
 
-      <main>
-        <section
-          id="advisor-section"
-          class="bg-white p-6 md:p-8 rounded-2xl shadow-lg max-w-4xl mx-auto"
+      <div class="flex items-center gap-3">
+        <!-- Theme Toggle Button -->
+        <button
+          id="theme-toggle"
+          class="flex items-center gap-2 p-2 px-3 rounded-xl border border-border-light dark:border-border-dark bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all cursor-pointer text-xs font-medium"
+          aria-label="Toggle tema gelap/terang"
         >
-          <div id="questionnaire">
-            <div
-              id="step-indicators"
-              class="flex justify-center items-center space-x-4 mb-8"
-            ></div>
-            <div id="step-1" class="step fade-in">
-              <h3 class="text-xl font-semibold text-center mb-6">
-                Anggaran & Preferensi
-              </h3>
-              <div class="space-y-6">
+          <span id="theme-toggle-light-icon" class="material-symbols-outlined text-amber-400 text-lg hidden">light_mode</span>
+          <span id="theme-toggle-dark-icon" class="material-symbols-outlined text-slate-600 dark:text-slate-300 text-lg hidden">dark_mode</span>
+          <span id="theme-toggle-text">Mode</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content: Two Columns Layout -->
+    <main class="flex-grow p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+      <div class="flex flex-col lg:flex-row gap-6 items-start">
+        
+        <!-- Left Panel: Form & Questionnaire (5 columns) -->
+        <div class="w-full lg:w-5/12 bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark p-6 shadow-sm lg:sticky lg:top-24 max-h-[calc(100vh-7rem)] overflow-y-auto custom-scrollbar transition-colors">
+          <div class="mb-6 border-b border-border-light dark:border-border-dark pb-4">
+            <h1 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white tracking-tight mb-1">
+              Tentukan Preferensi Anda
+            </h1>
+            <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400">
+              Bantu AI kami menganalisis pilihan laptop yang paling tepat untuk Anda.
+            </p>
+          </div>
+
+          <div class="space-y-6">
+            <!-- 1. Budget Range -->
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <label class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  Rentang Anggaran (Juta Rp)
+                </label>
+              </div>
+              <div class="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label
-                    class="block text-sm font-medium text-slate-700 mb-2 text-center"
-                    >Tentukan rentang harga (dalam Juta Rupiah).</label
-                  >
-                  <div
-                    class="flex flex-col sm:flex-row gap-4 items-center justify-center"
-                  >
-                    <div class="w-full sm:w-1/2">
-                      <label
-                        for="budget_min"
-                        class="block text-xs font-medium text-slate-600"
-                        >Minimum (juta)</label
-                      >
-                      <input
-                        type="number"
-                        id="budget_min"
-                        class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        value="3"
-                      />
-                    </div>
-                    <div class="w-full sm:w-1/2">
-                      <label
-                        for="budget_max"
-                        class="block text-xs font-medium text-slate-600"
-                        >Maksimum (juta)</label
-                      >
-                      <input
-                        type="number"
-                        id="budget_max"
-                        class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        value="20"
-                      />
-                    </div>
+                  <label for="budget_min" class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Minimal (Juta)</label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-semibold">Rp</span>
+                    <input
+                      id="budget_min"
+                      type="number"
+                      class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-700/60 border border-border-light dark:border-border-dark rounded-xl text-sm font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                      value="3"
+                      min="1"
+                    />
                   </div>
                 </div>
                 <div>
-                  <label
-                    for="recommendation_count"
-                    class="block text-sm font-medium text-slate-700 mb-2 text-center"
-                    >Berapa banyak rekomendasi yang Anda inginkan?</label
-                  >
-                  <select
-                    id="recommendation_count"
-                    class="block w-full max-w-xs mx-auto rounded-md border-slate-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                  >
-                    <option value="3">3 Rekomendasi</option>
-                    <option value="4">4 Rekomendasi</option>
-                    <option value="5">5 Rekomendasi</option>
-                  </select>
+                  <label for="budget_max" class="block text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1">Maksimal (Juta)</label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs font-semibold">Rp</span>
+                    <input
+                      id="budget_max"
+                      type="number"
+                      class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-700/60 border border-border-light dark:border-border-dark rounded-xl text-sm font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+                      value="20"
+                      min="2"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-            <div id="step-2" class="step hidden fade-in">
-              <h3 class="text-xl font-semibold text-center mb-2">
-                Apa Penggunaan Utama Laptop Anda?
-              </h3>
-              <p class="text-center text-slate-500 mb-6 text-sm">
-                Pilih satu yang paling menggambarkan kebutuhan Anda.
-              </p>
-              <div
-                class="grid grid-cols-2 gap-3 md:gap-4"
-                data-question="primary_use"
-              >
-                <div
-                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+
+            <!-- 2. Recommendation Count -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                Jumlah Rekomendasi
+              </label>
+              <div class="flex gap-2" id="recommendation-count-container">
+                <button type="button" class="rec-count-btn selected flex-1 py-2 px-3 rounded-xl border border-border-light dark:border-border-dark font-semibold text-xs transition-all" data-value="3">
+                  3 Pilihan
+                </button>
+                <button type="button" class="rec-count-btn flex-1 py-2 px-3 rounded-xl border border-border-light dark:border-border-dark text-slate-600 dark:text-slate-300 font-semibold text-xs transition-all hover:bg-slate-100 dark:hover:bg-slate-700" data-value="4">
+                  4 Pilihan
+                </button>
+                <button type="button" class="rec-count-btn flex-1 py-2 px-3 rounded-xl border border-border-light dark:border-border-dark text-slate-600 dark:text-slate-300 font-semibold text-xs transition-all hover:bg-slate-100 dark:hover:bg-slate-700" data-value="5">
+                  5 Pilihan
+                </button>
+              </div>
+              <input type="hidden" id="recommendation_count" value="3" />
+            </div>
+
+            <!-- 3. Primary Use -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">
+                Penggunaan Utama (Pilih 1)
+              </label>
+              <div class="grid grid-cols-2 gap-2.5" data-question="primary_use">
+                <button
+                  type="button"
+                  class="option-card flex flex-col items-center justify-center p-3.5 rounded-xl border border-border-light dark:border-border-dark bg-slate-50/70 dark:bg-slate-700/40 hover:border-primary transition-all text-center group"
                   data-value="Kantor & Mahasiswa"
                 >
-                  <div class="text-3xl md:text-4xl mb-2">💼</div>
-                  <h4 class="font-semibold text-sm md:text-base">
-                    Kantor & Mahasiswa
-                  </h4>
-                </div>
-                <div
-                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary text-2xl mb-1">work</span>
+                  <span class="font-semibold text-xs text-slate-800 dark:text-slate-200">Kantor & Kuliah</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="option-card flex flex-col items-center justify-center p-3.5 rounded-xl border border-border-light dark:border-border-dark bg-slate-50/70 dark:bg-slate-700/40 hover:border-primary transition-all text-center group"
                   data-value="Gaming"
                 >
-                  <div class="text-3xl md:text-4xl mb-2">🎮</div>
-                  <h4 class="font-semibold text-sm md:text-base">Gaming</h4>
-                </div>
-                <div
-                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary text-2xl mb-1">sports_esports</span>
+                  <span class="font-semibold text-xs text-slate-800 dark:text-slate-200">Gaming</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="option-card flex flex-col items-center justify-center p-3.5 rounded-xl border border-border-light dark:border-border-dark bg-slate-50/70 dark:bg-slate-700/40 hover:border-primary transition-all text-center group"
                   data-value="Kreasi Konten (Video/Desain)"
                 >
-                  <div class="text-3xl md:text-4xl mb-2">🎨</div>
-                  <h4 class="font-semibold text-sm md:text-base">
-                    Kreasi Konten
-                  </h4>
-                </div>
-                <div
-                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary text-2xl mb-1">palette</span>
+                  <span class="font-semibold text-xs text-slate-800 dark:text-slate-200">Kreasi Konten</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="option-card flex flex-col items-center justify-center p-3.5 rounded-xl border border-border-light dark:border-border-dark bg-slate-50/70 dark:bg-slate-700/40 hover:border-primary transition-all text-center group"
                   data-value="Programming"
                 >
-                  <div class="text-3xl md:text-4xl mb-2">💻</div>
-                  <h4 class="font-semibold text-sm md:text-base">
-                    Programming
-                  </h4>
-                </div>
+                  <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary text-2xl mb-1">terminal</span>
+                  <span class="font-semibold text-xs text-slate-800 dark:text-slate-200">Programming</span>
+                </button>
               </div>
             </div>
-            <div id="step-3" class="step hidden fade-in">
-              <h3 class="text-xl font-semibold text-center mb-2">
-                Apa yang Paling Penting Bagi Anda?
-              </h3>
-              <p class="text-center text-slate-500 mb-6 text-sm">
-                Pilih hingga dua prioritas utama.
-              </p>
-              <div
-                class="grid grid-cols-2 gap-3 md:gap-4"
-                data-question="priorities"
-                data-max-selection="2"
-              >
-                <div
-                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+
+            <!-- 4. Priorities -->
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <label class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  Prioritas Utama
+                </label>
+                <span class="text-[11px] font-medium text-primary dark:text-blue-400">Maks. 2</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2" data-question="priorities" data-max-selection="2">
+                <button
+                  type="button"
+                  class="option-card py-2.5 px-3 rounded-xl border border-border-light dark:border-border-dark bg-slate-50/70 dark:bg-slate-700/40 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
                   data-value="Performa"
                 >
-                  <div class="text-3xl md:text-4xl mb-2">🚀</div>
-                  <h4 class="font-semibold text-sm md:text-base">Performa</h4>
-                </div>
-                <div
-                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  <span class="material-symbols-outlined text-base">rocket_launch</span>
+                  <span>Performa</span>
+                </button>
+                <button
+                  type="button"
+                  class="option-card py-2.5 px-3 rounded-xl border border-border-light dark:border-border-dark bg-slate-50/70 dark:bg-slate-700/40 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
                   data-value="Portabilitas (Ringan)"
                 >
-                  <div class="text-3xl md:text-4xl mb-2">✈️</div>
-                  <h4 class="font-semibold text-sm md:text-base">
-                    Portabilitas
-                  </h4>
-                </div>
-                <div
-                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  <span class="material-symbols-outlined text-base">flight</span>
+                  <span>Portabilitas</span>
+                </button>
+                <button
+                  type="button"
+                  class="option-card py-2.5 px-3 rounded-xl border border-border-light dark:border-border-dark bg-slate-50/70 dark:bg-slate-700/40 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
                   data-value="Daya Tahan Baterai"
                 >
-                  <div class="text-3xl md:text-4xl mb-2">🔋</div>
-                  <h4 class="font-semibold text-sm md:text-base">
-                    Daya Tahan Baterai
-                  </h4>
-                </div>
-                <div
-                  class="option-card p-4 border rounded-lg text-center bg-white hover:shadow-md"
+                  <span class="material-symbols-outlined text-base">battery_charging_full</span>
+                  <span>Baterai Awet</span>
+                </button>
+                <button
+                  type="button"
+                  class="option-card py-2.5 px-3 rounded-xl border border-border-light dark:border-border-dark bg-slate-50/70 dark:bg-slate-700/40 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all"
                   data-value="Kualitas Layar"
                 >
-                  <div class="text-3xl md:text-4xl mb-2">🖼️</div>
-                  <h4 class="font-semibold text-sm md:text-base">
-                    Kualitas Layar
-                  </h4>
-                </div>
+                  <span class="material-symbols-outlined text-base">desktop_windows</span>
+                  <span>Layar Jernih</span>
+                </button>
               </div>
             </div>
-            <div class="mt-8 flex justify-center space-x-4">
-              <button
-                id="prev-btn"
-                class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-lg transition-colors hidden"
-              >
-                Kembali
-              </button>
-              <button
-                id="next-btn"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors"
-              >
-                Lanjut
-              </button>
-              <button
-                id="get-recommendations-btn"
-                class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-8 rounded-lg transition-colors hidden"
-              >
-                Dapatkan Rekomendasi
-              </button>
-            </div>
           </div>
-        </section>
 
-        <section id="loading-section" class="text-center p-8 hidden">
-          <div role="status" class="flex flex-col items-center">
-            <svg
-              aria-hidden="true"
-              class="w-10 h-10 text-slate-200 animate-spin fill-blue-600"
-              viewBox="0 0 100 101"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+          <!-- Action Buttons -->
+          <div class="mt-8 pt-4 border-t border-border-light dark:border-border-dark space-y-2.5">
+            <button
+              id="get-recommendations-btn"
+              type="button"
+              class="w-full bg-primary hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
             >
-              <path
-                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                fill="currentColor"
-              />
-              <path
-                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0492C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5424 39.6781 93.9676 39.0409Z"
-                fill="currentFill"
-              />
-            </svg>
-            <p class="mt-4 text-lg text-slate-600">
-              AI sedang menganalisis kebutuhan Anda...
-            </p>
-          </div>
-        </section>
-
-        <section id="results-section" class="hidden fade-in">
-          <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-slate-900">
-              Rekomendasi AI Untuk Anda
-            </h2>
-          </div>
-
-          <div
-            id="recommendations-list"
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-8"
-          ></div>
-
-          <div
-            id="no-results"
-            class="text-center p-8 bg-white rounded-2xl shadow-md hidden"
-          >
-            <div class="text-6xl mb-4">😔</div>
-            <h3 class="text-2xl font-bold">Tidak Ada Laptop yang Cocok</h3>
-            <p class="text-slate-600 mt-2">
-              Coba sesuaikan anggaran atau preferensi Anda untuk menemukan
-              hasil.
-            </p>
-          </div>
-
-          <div class="text-center mt-4">
-            <p
-              class="mt-2 text-xs text-amber-700 bg-amber-100 p-2 rounded-md max-w-md mx-auto"
-            >
-              <strong>Perhatian:</strong> Harga yang ditampilkan adalah estimasi
-              dan dapat berubah sewaktu-waktu atau berbeda di setiap toko.
-            </p>
+              <span class="material-symbols-outlined text-xl">auto_awesome</span>
+              <span>Dapatkan Rekomendasi</span>
+            </button>
             <button
               id="reset-btn"
-              class="mt-6 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition-colors text-sm"
+              type="button"
+              class="w-full bg-transparent border border-border-light dark:border-border-dark text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold py-2.5 px-4 rounded-xl transition-all text-xs cursor-pointer"
             >
-              Ulangi Kuesioner
+              Reset Pilihan
             </button>
           </div>
-        </section>
-      </main>
-    </div>
+        </div>
+
+        <!-- Right Panel: Results, Analytics & Status (7 columns) -->
+        <div class="w-full lg:w-7/12 flex flex-col min-h-[550px]" id="results-panel">
+          
+          <!-- State 1: Initial Empty State -->
+          <div
+            id="empty-state"
+            class="bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark flex flex-col items-center justify-center p-8 md:p-12 text-center min-h-[500px] shadow-sm transition-colors"
+          >
+            <div class="w-24 h-24 mb-6 rounded-2xl bg-blue-50 dark:bg-blue-950/60 flex items-center justify-center text-primary dark:text-blue-400">
+              <span class="material-symbols-outlined text-5xl">psychology</span>
+            </div>
+            <h2 class="text-xl md:text-2xl font-bold text-slate-900 dark:text-white mb-2">
+              Siap Mencari Laptop Ideal?
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md leading-relaxed">
+              Tentukan rentang anggaran, kebutuhan pemakaian, dan prioritas fitur di panel sebelah kiri, lalu klik <strong>"Dapatkan Rekomendasi"</strong>.
+            </p>
+          </div>
+
+          <!-- State 2: Skeleton Loading State -->
+          <div
+            id="loading-section"
+            class="hidden bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark p-6 md:p-8 space-y-6 shadow-sm fade-in"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-6 h-6 rounded-full bg-primary/20 animate-spin flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined text-sm">autorenew</span>
+              </div>
+              <p class="font-bold text-slate-900 dark:text-white text-sm">
+                AI sedang menganalisis spesifikasi laptop yang sesuai...
+              </p>
+            </div>
+
+            <!-- Skeleton Item 1 -->
+            <div class="rounded-xl border border-border-light dark:border-border-dark p-5 space-y-3">
+              <div class="flex justify-between items-center">
+                <div class="h-5 w-1/3 rounded shimmer"></div>
+                <div class="h-6 w-24 rounded-full shimmer"></div>
+              </div>
+              <div class="h-4 w-1/2 rounded shimmer"></div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+                <div class="h-12 rounded-lg shimmer"></div>
+                <div class="h-12 rounded-lg shimmer"></div>
+                <div class="h-12 rounded-lg shimmer"></div>
+                <div class="h-12 rounded-lg shimmer"></div>
+              </div>
+              <div class="h-14 rounded-lg shimmer"></div>
+            </div>
+
+            <!-- Skeleton Item 2 -->
+            <div class="rounded-xl border border-border-light dark:border-border-dark p-5 space-y-3">
+              <div class="flex justify-between items-center">
+                <div class="h-5 w-1/3 rounded shimmer"></div>
+                <div class="h-6 w-24 rounded-full shimmer"></div>
+              </div>
+              <div class="h-4 w-1/2 rounded shimmer"></div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+                <div class="h-12 rounded-lg shimmer"></div>
+                <div class="h-12 rounded-lg shimmer"></div>
+                <div class="h-12 rounded-lg shimmer"></div>
+                <div class="h-12 rounded-lg shimmer"></div>
+              </div>
+              <div class="h-14 rounded-lg shimmer"></div>
+            </div>
+          </div>
+
+          <!-- State 3: Recommendation Results -->
+          <div id="results-section" class="hidden space-y-6 fade-in">
+            <!-- Results Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-card-light dark:bg-card-dark p-4 rounded-2xl border border-border-light dark:border-border-dark shadow-sm">
+              <div>
+                <h2 class="font-bold text-slate-900 dark:text-white text-base md:text-lg flex items-center gap-2">
+                  <span>🎯 Hasil Rekomendasi AI</span>
+                </h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                  Berikut laptop terbaik yang dikurasi khusus untuk profil Anda.
+                </p>
+              </div>
+            </div>
+
+            <!-- Recommendation Cards List -->
+            <div id="recommendations-list" class="space-y-4"></div>
+
+            <!-- Comparison Chart Section -->
+            <div
+              id="chart-section"
+              class="bg-card-light dark:bg-card-dark p-6 rounded-2xl border border-border-light dark:border-border-dark shadow-sm transition-all"
+            >
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+                <div>
+                  <h3 class="text-base md:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-primary text-xl">insights</span>
+                    <span>Bagan Komparasi Metrik AI</span>
+                  </h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                    Bandingkan aspek performa, portabilitas, baterai, layar, dan *value* (skala 1-10).
+                  </p>
+                </div>
+                <!-- Chart Type Switcher Pills -->
+                <div class="inline-flex rounded-xl bg-slate-100 dark:bg-slate-700/60 p-1 border border-border-light dark:border-border-dark">
+                  <button
+                    id="chart-radar-btn"
+                    type="button"
+                    class="px-3 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-slate-800 text-primary dark:text-blue-400 shadow-sm transition-all cursor-pointer"
+                  >
+                    Radar Chart
+                  </button>
+                  <button
+                    id="chart-bar-btn"
+                    type="button"
+                    class="px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer"
+                  >
+                    Bar Chart
+                  </button>
+                </div>
+              </div>
+
+              <div class="chart-wrapper">
+                <canvas id="comparisonChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Empty / No Results Notification -->
+            <div
+              id="no-results"
+              class="hidden bg-card-light dark:bg-card-dark rounded-2xl border border-border-light dark:border-border-dark p-8 text-center"
+            >
+              <span class="material-symbols-outlined text-4xl text-slate-400 mb-2">search_off</span>
+              <h3 class="font-bold text-slate-900 dark:text-white text-base">Tidak Ada Laptop yang Cocok</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Cobalah memperluas rentang anggaran atau mengubah prioritas Anda.
+              </p>
+            </div>
+
+            <!-- Disclaimer Notice -->
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 text-center px-4">
+              ⚠️ <em>Catatan: Harga dan stok dapat berfluktuasi sewaktu-waktu tergantung penjual di marketplace Indonesia.</em>
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
 
     <script src="script.js"></script>
   </body>

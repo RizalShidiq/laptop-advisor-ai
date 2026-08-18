@@ -3,24 +3,31 @@ import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from google import genai
+from google.genai import types
 
 app = Flask(__name__)
 CORS(app)
 
+# Initialize Gemini client using Google GenAI SDK
 try:
     api_key = os.environ.get("GEMINI_API_KEY")
-    genai.configure(api_key=api_key)
-    print("Gemini API Key loaded successfully.")
+    if api_key:
+        client = genai.Client(api_key=api_key)
+        print("Gemini Client configured with API key.")
+    else:
+        client = genai.Client()
+        print("Gemini Client configured with environment/default credentials.")
 except Exception as e:
-    print(f"Error configuring Gemini API: {e}")
+    print(f"Warning initializing Gemini Client: {e}")
+    client = None
 
 @app.route('/api/get-recommendation', methods=['POST'])
 def get_recommendation():
     try:
-        data = request.json
-        budget_min = data.get('budget_min')
-        budget_max = data.get('budget_max')
-        primary_use = data.get('primary_use')
+        data = request.json or {}
+        budget_min = data.get('budget_min', 3000000)
+        budget_max = data.get('budget_max', 20000000)
+        primary_use = data.get('primary_use', 'Umum')
         priorities = ", ".join(data.get('priorities', []))
         recommendation_count = data.get('recommendation_count', 3)
         
@@ -39,18 +46,32 @@ def get_recommendation():
         2. Cari {recommendation_count} laptop paling sesuai yang ada di pasaran Indonesia saat ini.
         3. Untuk setiap laptop, berikan:
            - "nama": Nama lengkap laptop.
-           - "brand": Nama merek (contoh: "asus", "lenovo").
-           - "harga": Estimasi harga dalam Rupiah (angka).
-           - "sumber_harga": Sumber pengecekan harga dan tanggal (Contoh: "Tokopedia, 9 Juli 2025").
+           - "brand": Nama merek (contoh: "asus", "lenovo", "apple", "acer", "hp", "dell", "msi").
+           - "harga": Estimasi harga dalam Rupiah (angka bilangan bulat murni).
+           - "sumber_harga": Sumber pengecekan harga dan tanggal (Contoh: "Tokopedia, 2025").
            - "spesifikasi": Objek JSON berisi "CPU", "GPU", "RAM", "Penyimpanan".
-           - "penjelasan": Penjelasan singkat.
-           - "link_tokopedia": Link pencarian di Tokopedia.
-           - "link_lazada": Link pencarian di Lazada.
+           - "skor": Objek JSON nilai 1-10 (boleh desimal seperti 8.5) untuk evaluasi metrik:
+               - "performa": Skor performa prosesor/grafis untuk kebutuhan tersebut (1-10)
+               - "portabilitas": Skor keringanan & kemudahan dibawa (1-10)
+               - "baterai": Skor efisiensi daya tahan baterai (1-10)
+               - "layar": Skor kualitas panel & resolusi layar (1-10)
+               - "value": Skor perbandingan harga vs spesifikasi (1-10)
+           - "penjelasan": Penjelasan ringkas mengapa laptop ini cocok untuk pengguna.
+           - "link_tokopedia": URL pencarian Tokopedia untuk laptop tersebut.
+           - "link_lazada": URL pencarian Lazada untuk laptop tersebut.
         4. Pastikan outputnya adalah objek JSON tunggal dengan kunci "rekomendasi".
         """
+
+        current_client = client or (genai.Client(api_key=os.environ.get("GEMINI_API_KEY")) if os.environ.get("GEMINI_API_KEY") else genai.Client())
         
-        model = genai.GenerativeModel('gemini-3-flash-preview', generation_config=genai.types.GenerationConfig(response_mime_type="application/json"))
-        response = model.generate_content(prompt_template)
+        response = current_client.models.generate_content(
+            model="gemini-3.7-flash",
+            contents=prompt_template,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                temperature=0.7
+            )
+        )
         return response.text, 200, {'Content-Type': 'application/json'}
 
     except Exception as e:
