@@ -11,7 +11,7 @@
 
 **Laptop Advisor AI** adalah aplikasi web modern berbasis kecerdasan buatan (*AI*) yang dirancang untuk membantu pengguna—baik pemula maupun pengguna profesional—menemukan rekomendasi laptop paling ideal di pasar Indonesia berdasarkan anggaran, kebutuhan penggunaan spesifik, dan prioritas fitur pribadi.
 
-Didukung oleh **Google GenAI SDK (`gemini-2.5-flash`)**, aplikasi ini menganalisis spesifikasi pasar terkini secara *real-time* dan menyajikan hasil dalam format kartu terstruktur beserta grafik komparasi multi-dimensi.
+Didukung oleh **Google GenAI SDK (`gemini-3.7-flash`)**, aplikasi ini menganalisis spesifikasi pasar terkini secara *real-time* dan menyajikan hasil dalam format kartu terstruktur beserta grafik komparasi multi-dimensi.
 
 🔗 **[Demo Langsung Aplikasi](https://laptop-advisor-ai.vercel.app/)**
 
