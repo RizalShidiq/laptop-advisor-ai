@@ -1,103 +1,182 @@
 # 🤖 Laptop Advisor AI
 
-Sebuah aplikasi web berbasis AI yang membantu pengguna, terutama yang awam teknologi, untuk menemukan rekomendasi laptop ideal berdasarkan anggaran, kebutuhan (gaming, kerja, dll.), dan prioritas pribadi mereka. Proyek ini menggunakan Google Gemini API sebagai otak di balik mesin rekomendasinya.
+<p align="center">
+  <img src="https://img.shields.io/badge/Google%20Gemini-Google%20GenAI%20SDK-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google Gemini" />
+  <img src="https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Flask-3.1-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Chart.js-4.x-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white" alt="Chart.js" />
+  <img src="https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
+</p>
 
-**[Lihat Demo Langsung](https://laptop-advisor-ai.vercel.app/)**
+**Laptop Advisor AI** adalah aplikasi web modern berbasis kecerdasan buatan (*AI*) yang dirancang untuk membantu pengguna—baik pemula maupun pengguna profesional—menemukan rekomendasi laptop paling ideal di pasar Indonesia berdasarkan anggaran, kebutuhan penggunaan spesifik, dan prioritas fitur pribadi.
 
-## ✨ Fitur Utama
+Didukung oleh **Google GenAI SDK (`gemini-2.5-flash`)**, aplikasi ini menganalisis spesifikasi pasar terkini secara *real-time* dan menyajikan hasil dalam format kartu terstruktur beserta grafik komparasi multi-dimensi.
 
-- **Dashboard Interaktif Satu Halaman (2-Kolom)**: Seluruh formulir preferensi (anggaran, kegunaan, prioritas) berada di panel sebelah kiri, sementara hasil analisis, kartu rekomendasi, dan grafik perbandingan ditampilkan seketika di panel sebelah kanan.
-- **Rekomendasi Berbasis AI**: Menggunakan kekuatan Google Gemini API untuk menganalisis kebutuhan dan memberikan rekomendasi laptop paling relevan dari pasar Indonesia.
-- **Bagan Perbandingan Interaktif (Chart.js)**: Menyajikan grafik metrik multi-dimensi (**Radar Chart** & **Bar Chart**) untuk membandingkan Performa, Portabilitas, Daya Tahan Baterai, Kualitas Layar, dan *Value for Money*.
-- **Skeleton Shimmer Loading**: Tampilan placeholder animasi modern saat AI memproses data rekomendasi.
-- **Dukungan Dark Mode**: Opsi tema Gelap dan Terang yang nyaman di mata dengan persistensi preferensi di `localStorage`.
-- **Hasil Terpersonalisasi**: Menampilkan kartu rekomendasi lengkap dengan logo merek, spesifikasi teknis (CPU, GPU, RAM, Penyimpanan), ulasan singkat AI, estimasi harga, dan tautan langsung ke Tokopedia.
-
----
-
-## 🛠️ Teknologi yang Digunakan
-
-- **Frontend**: HTML5, Tailwind CSS, Vanilla JavaScript, Chart.js
-- **Backend**: Python 3, Flask, CORS
-- **AI Engine**: Google Gemini API via **Google GenAI SDK** (`google-genai` & `gemini-2.5-flash`)
-- **Deployment**: Serverless Architecture di Vercel
+🔗 **[Demo Langsung Aplikasi](https://laptop-advisor-ai.vercel.app/)**
 
 ---
 
-## 📂 Struktur Proyek
+## ✨ Fitur Unggulan
+
+- 🖥️ **Dashboard Satu Halaman (2-Kolom Terpisah)**:
+  - **Panel Kiri (Sticky Input)**: Kontrol terpadu untuk rentang anggaran, jumlah rekomendasi (3, 4, atau 5 pilihan), kebutuhan utama (*Kantor/Kuliah, Gaming, Kreasi Konten, Programming*), dan pemilihan prioritas (maksimal 2).
+  - **Panel Kanan (Dynamic Results)**: Hasil rekomendasi langsung tampil seketika tanpa perlu berpindah-pindah halaman atau step wizard.
+- 🧠 **Mesin Rekomendasi Berbasis AI**:
+  - Menggunakan model **Gemini 2.5 Flash** melalui **Google GenAI SDK** (`google-genai`) dengan *Structured JSON Output*.
+- 📊 **Visualisasi Metrik Interaktif (Chart.js)**:
+  - Menyajikan grafik komparasi 5 dimensi: *Performa*, *Portabilitas*, *Daya Baterai*, *Kualitas Layar*, dan *Value for Money*.
+  - Dilengkapi tombol switcher untuk beralih antara **Radar Chart** dan **Bar Chart**.
+- 🌓 **Dukungan Dark Mode Adaptif**:
+  - Pilihan tema Gelap (*Dark*) dan Terang (*Light*) dengan persistensi di `localStorage` dan sinkronisasi warna grafik instan.
+- ✨ **Skeleton Shimmer Loading**:
+  - Animasi placeholder modern saat AI memproses rekomendasi.
+- 🛒 **Integrasi Marketplace Langsung**:
+  - Setiap kartu rekomendasi dilengkapi estimasi harga pasar Indonesia (IDR), ringkasan ulasan AI, grid 4 spesifikasi kunci (CPU, GPU, RAM, Storage), dan tautan pencarian instan ke Tokopedia.
+
+---
+
+## 🛠️ Arsitektur & Teknologi
+
+| Lapisan | Teknologi |
+|---|---|
+| **Frontend** | HTML5, Vanilla JavaScript (ES6+), Tailwind CSS, Material Symbols, Chart.js |
+| **Backend** | Python 3 (Flask, Flask-CORS) |
+| **AI Engine** | Google Gemini API via official **Google GenAI SDK** (`google-genai`) |
+| **Deployment** | Serverless Architecture di **Vercel** (`vercel.json`) |
+
+---
+
+## 📂 Struktur Repositori
 
 ```
-/
+laptop-advisor-ai/
 ├── api/
-│   └── index.py         # Backend Flask & pemrosesan prompt terstruktur ke Gemini API
+│   └── index.py             # Server Flask & integrasi Google GenAI SDK
 ├── public/
-│   ├── index.html       # Antarmuka web utama (UI kuesioner, dark mode, chart container)
-│   ├── script.js        # State management, Chart.js rendering, dark mode logic, & API fetch
-│   └── style.css        # Animasi shimmer skeleton, transisi tema, dan custom styling
-├── vercel.json          # Konfigurasi routing & deployment serverless Vercel
-├── requirements.txt     # Daftar dependensi Python
-└── README.md            # Dokumentasi proyek & panduan instalasi
+│   ├── index.html           # Antarmuka Dashboard 2-Kolom & Dark Mode
+│   ├── script.js            # Interaksi DOM, validasi, Chart.js, & API fetch
+│   └── style.css            # Animasi shimmer skeleton & custom styles
+├── .gitignore               # Daftar pengecualian Git (venv, cache, secrets)
+├── requirements.txt         # Dependensi backend Python
+├── vercel.json              # Konfigurasi routing & serverless build Vercel
+└── README.md                # Dokumentasi proyek
 ```
 
 ---
 
-## 🚀 Cara Menjalankan Proyek Secara Lokal
+## 🚀 Panduan Instalasi & Menjalankan Lokal
 
-Untuk menjalankan aplikasi ini di komputer Anda, ikuti langkah-langkah berikut:
+Ikuti langkah-langkah berikut untuk menjalankan proyek di komputer lokal:
 
-1.  **Clone Repositori**
+### 1. Clone Repositori
+```bash
+git clone https://github.com/RizalShidiq/laptop-advisor-ai.git
+cd laptop-advisor-ai
+```
 
-    ```bash
-    git clone https://github.com/RizalShidiq/laptop-advisor-ai.git
-    cd laptop-advisor-ai
-    ```
+### 2. Siapkan Virtual Environment & Instal Dependensi
+```bash
+# Buat virtual environment Python
+python -m venv .venv
 
-2.  **Siapkan Lingkungan Python & Instal Dependensi**
+# Aktifkan virtual environment
+# Windows (PowerShell):
+.\.venv\Scripts\Activate.ps1
+# Windows (Command Prompt):
+.\.venv\Scripts\activate.bat
+# Linux / macOS:
+source .venv/bin/activate
 
-    ```bash
-    # Buat virtual environment (opsional tapi direkomendasikan)
-    python -m venv venv
-    source venv/bin/activate  # Di Windows: venv\Scripts\activate
+# Instal pustaka yang diperlukan
+pip install -r requirements.txt
+```
 
-    # Instal semua library yang dibutuhkan
-    pip install -r requirements.txt
-    ```
+### 3. Konfigurasi API Key Google Gemini
+Dapatkan API Key gratis di [Google AI Studio](https://aistudio.google.com/apikey), lalu atur di terminal Anda:
 
-3.  **Atur Environment Variable**
-    Backend ini membutuhkan API Key dari Google Gemini. Atur di terminal Anda:
+```bash
+# Windows (PowerShell):
+$env:GEMINI_API_KEY="API_KEY_GEMINI_ANDA"
 
-    ```bash
-    # Untuk macOS/Linux
-    export GEMINI_API_KEY="KUNCI_API_GEMINI_ANDA"
+# Windows (CMD):
+set GEMINI_API_KEY=API_KEY_GEMINI_ANDA
 
-    # Untuk Windows (Command Prompt)
-    set GEMINI_API_KEY="KUNCI_API_GEMINI_ANDA"
-    ```
+# Linux / macOS:
+export GEMINI_API_KEY="API_KEY_GEMINI_ANDA"
+```
 
-4.  **Jalankan Backend Server**
-    Buka terminal **pertama** dan jalankan server Flask. Biarkan terminal ini tetap berjalan.
+### 4. Jalankan Backend Server
+```bash
+flask --app api/index run
+```
+*Server API akan aktif di `http://127.0.0.1:5000`.*
 
-    ```bash
-    flask --app api/index run
-    ```
-
-    Server akan berjalan di `http://127.0.0.1:5000`.
-
-5.  **Jalankan Frontend Server**
-    Pastikan `script.js` Anda menggunakan URL `http://127.0.0.1:5000` untuk `fetch`. Buka `index.html` menggunakan ekstensi **Live Server** di VS Code atau server lokal lainnya.
+### 5. Buka Frontend
+Buka file `public/index.html` menggunakan **Live Server** di VS Code atau web server lokal pilihan Anda.
 
 ---
 
-## ☁️ Deployment
+## 📡 Dokumentasi API
 
-Proyek ini sudah dikonfigurasi untuk deployment yang mudah ke:
+### `POST /api/get-recommendation`
+Menerima kriteria preferensi pengguna dan mengembalikan daftar rekomendasi laptop terstruktur beserta skor evaluasi metrik.
 
-- **Vercel**: Menggunakan file `vercel.json`.
+#### Request Body (JSON):
+```json
+{
+  "budget_min": 5000000,
+  "budget_max": 15000000,
+  "primary_use": "Gaming",
+  "priorities": ["Performa", "Kualitas Layar"],
+  "recommendation_count": 3
+}
+```
 
-Cukup hubungkan repositori GitHub Anda ke salah satu platform tersebut dan jangan lupa untuk menambahkan `GEMINI_API_KEY` di bagian Environment Variables pada pengaturan situs.
+#### Response Body (JSON):
+```json
+{
+  "rekomendasi": [
+    {
+      "nama": "Lenovo LOQ 15IAX9",
+      "brand": "lenovo",
+      "harga": 12499000,
+      "sumber_harga": "Tokopedia, 2025",
+      "spesifikasi": {
+        "CPU": "Intel Core i5-12450HX",
+        "GPU": "NVIDIA GeForce RTX 3050 6GB",
+        "RAM": "12GB DDR5",
+        "Penyimpanan": "512GB NVMe SSD"
+      },
+      "skor": {
+        "performa": 8.5,
+        "portabilitas": 6.5,
+        "baterai": 6.0,
+        "layar": 8.5,
+        "value": 9.0
+      },
+      "penjelasan": "Pilihan gaming entry-level terbaik dengan GPU RTX 3050 6GB dan layar 100% sRGB.",
+      "link_tokopedia": "https://www.tokopedia.com/search?q=Lenovo+LOQ+15IAX9",
+      "link_lazada": "https://www.lazada.co.id/catalog/?q=Lenovo+LOQ+15IAX9"
+    }
+  ]
+}
+```
+
+---
+
+## ☁️ Deployment ke Vercel
+
+Proyek ini telah dikonfigurasi untuk berjalan di **Vercel** secara otomatis menggunakan file [`vercel.json`](./vercel.json).
+
+1. Hubungkan repositori GitHub ini ke [Vercel](https://vercel.com).
+2. Tambahkan variabel lingkungan pada pengaturan proyek:
+   - **Key:** `GEMINI_API_KEY`
+   - **Value:** `API_KEY_GEMINI_ANDA`
+3. Klik **Deploy**.
 
 ---
 
 ## 📄 Lisensi
 
-Proyek ini dilisensikan di bawah Lisensi MIT. Lihat file `LICENSE` untuk detailnya.
+Proyek ini dilisensikan di bawah [MIT License](LICENSE). Bebas digunakan, dikembangkan, dan dipelajari.
