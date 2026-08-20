@@ -1,14 +1,5 @@
 # 🤖 Laptop Advisor AI
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Google%20Gemini-Google%20GenAI%20SDK-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google Gemini" />
-  <img src="https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
-  <img src="https://img.shields.io/badge/Flask-3.1-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
-  <img src="https://img.shields.io/badge/Chart.js-4.x-FF6384?style=for-the-badge&logo=chartdotjs&logoColor=white" alt="Chart.js" />
-  <img src="https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
-</p>
-
 **Laptop Advisor AI** adalah aplikasi web modern berbasis kecerdasan buatan (*AI*) yang dirancang untuk membantu pengguna—baik pemula maupun pengguna profesional—menemukan rekomendasi laptop paling ideal di pasar Indonesia berdasarkan anggaran, kebutuhan penggunaan spesifik, dan prioritas fitur pribadi.
 
 Didukung oleh **Google GenAI SDK (`gemini-3.7-flash`)**, aplikasi ini menganalisis spesifikasi pasar terkini secara *real-time* dan menyajikan hasil dalam format kartu terstruktur beserta grafik komparasi multi-dimensi.
